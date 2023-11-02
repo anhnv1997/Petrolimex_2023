@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="iPGS.Tools">
+      <HintPath>..\..\packages\iPGS.Tools.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

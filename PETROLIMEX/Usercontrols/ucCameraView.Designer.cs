@@ -28,44 +28,41 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblCameraName = new System.Windows.Forms.Label();
-            this.panelCameraView = new System.Windows.Forms.Panel();
-            this.SuspendLayout();
+            lblCameraName = new Label();
+            panelCameraView = new Panel();
+            SuspendLayout();
             // 
             // lblCameraName
             // 
-            this.lblCameraName.AutoSize = true;
-            this.lblCameraName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblCameraName.Location = new System.Drawing.Point(1, 4);
-            this.lblCameraName.Name = "lblCameraName";
-            this.lblCameraName.Size = new System.Drawing.Size(38, 15);
-            this.lblCameraName.TabIndex = 0;
-            this.lblCameraName.Text = "label1";
+            lblCameraName.AutoSize = true;
+            lblCameraName.Dock = DockStyle.Top;
+            lblCameraName.Location = new Point(1, 5);
+            lblCameraName.Name = "lblCameraName";
+            lblCameraName.Size = new Size(50, 20);
+            lblCameraName.TabIndex = 0;
+            lblCameraName.Text = "label1";
             // 
             // panelCameraView
             // 
-            this.panelCameraView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelCameraView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelCameraView.Location = new System.Drawing.Point(1, 19);
-            this.panelCameraView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.panelCameraView.Name = "panelCameraView";
-            this.panelCameraView.Size = new System.Drawing.Size(520, 252);
-            this.panelCameraView.TabIndex = 1;
+            panelCameraView.BorderStyle = BorderStyle.FixedSingle;
+            panelCameraView.Dock = DockStyle.Fill;
+            panelCameraView.Location = new Point(1, 25);
+            panelCameraView.Name = "panelCameraView";
+            panelCameraView.Size = new Size(595, 337);
+            panelCameraView.TabIndex = 1;
             // 
             // ucCameraView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.panelCameraView);
-            this.Controls.Add(this.lblCameraName);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "ucCameraView";
-            this.Padding = new System.Windows.Forms.Padding(1, 4, 1, 1);
-            this.Size = new System.Drawing.Size(522, 272);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BorderStyle = BorderStyle.FixedSingle;
+            Controls.Add(panelCameraView);
+            Controls.Add(lblCameraName);
+            Name = "ucCameraView";
+            Padding = new Padding(1, 5, 1, 1);
+            Size = new Size(597, 363);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

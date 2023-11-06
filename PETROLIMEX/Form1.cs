@@ -15,6 +15,7 @@ using PETROLIMEX.Forms;
 using GeneralTool.NetworkTools;
 using iPGS.Tools;
 using PETROLIMEX;
+using System.Collections.Concurrent;
 //using iPGS.Tools;
 
 namespace iPGSTools
@@ -33,6 +34,9 @@ namespace iPGSTools
         private static string ImgPath = string.Empty;
         #endregion
 
+        public static ConcurrentQueue<GasModel> gasModelQueue = new ConcurrentQueue<GasModel>();
+        private bool IsEnableAutoOpenApp = true;
+
         #region Forms
         public Form1()
         {
@@ -40,7 +44,7 @@ namespace iPGSTools
             {
                 InitializeComponent();
                 frm = this;
-                
+
                 //Staticpool.vehicleWithAutoPayments.Add(new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = "38P105694" });
 
                 //foreach (Vehicle item in Staticpool.vehicleWithAutoPayments)
@@ -55,7 +59,6 @@ namespace iPGSTools
 
         }
 
-       
         //public static bool CheckRangeOfNetwork(string txtIP)
         //{
         //    IEnumerable<string> ips = NetWorkTools.GetLocalIPAddress();
@@ -74,8 +77,7 @@ namespace iPGSTools
         //    return isFound;
         //}
 
-
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             try
             {
@@ -93,15 +95,6 @@ namespace iPGSTools
                 }
                 panelCamera.SizeChanged += panelCamera_SizeChanged;
                 //StartAPIServer
-                try
-                {
-                    CreateHostBuilder().Build().RunAsync();
-                }
-                catch (Exception ex)
-                {
-                    LogHelperv2.Logger_CONTROLLER_Error($"Exception CreateHostBuilder ex = {ex}", LogHelperv2.SaveLogFolder);
-                    MessageBox.Show(ex.Message);
-                }
                 //ConnectCamera
                 StaticPool.camera = new Kztek.Cameras.Camera()
                 {
@@ -113,7 +106,7 @@ namespace iPGSTools
                     Chanel = 1,
                     Login = StaticPool.applicationConfig.CameraUsername,
                     Password = StaticPool.applicationConfig.CameraPassword,
-                    CameraType = CameraTypes.GetType("Dahua"),
+                    CameraType = CameraTypes.GetType("Tiandy"),
                     StreamType = StreamTypes.GetType("H264"),
                     Resolution = "1280x720",
                     UsingPlugins = 0,
@@ -137,18 +130,23 @@ namespace iPGSTools
                     controller.PollingStart();
                 }
                 InitDataGridView();
+
+                await Task.Delay(10000);
+                try
+                {
+                    CreateHostBuilder().Build().RunAsync();
+                }
+                catch (Exception ex)
+                {
+                    LogHelperv2.Logger_CONTROLLER_Error($"Exception CreateHostBuilder ex = {ex}", LogHelperv2.SaveLogFolder);
+                    MessageBox.Show(ex.Message);
+                }
             }
             catch (Exception ex)
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception Form1_Load ex: {ex}", LogHelperv2.SaveLogFolder);
             }
         }
-
-        private void InitDataGridView()
-        {
-            dgvAutoPaymentVehicle.RowTemplate.Height = 100;
-        }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
@@ -165,6 +163,51 @@ namespace iPGSTools
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception Form1_FormClosing ex: {ex}", LogHelperv2.SaveLogFolder);
             }
         }
+        private void Form1_FormClosing_1(object sender, FormClosingEventArgs e)
+        {
+            //controller.onEvent -= Controller_onEvent;
+            LogHelperv2.Logger_CONTROLLER_Error($"Đóng form Form1_FormClosing_1 với isEnableAutoApp = {IsEnableAutoOpenApp}", LogHelperv2.SaveLogFolder);
+
+            Task.Run(() =>
+            {
+                FISHelper.StopPollingAuthorize();
+            });
+        }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                button2.Visible = !button2.Visible;
+            }
+            else if (e.KeyCode == Keys.F6)
+            {
+                button1.Visible = !button1.Visible;
+            }
+            else if (e.KeyCode == Keys.F7)
+            {
+                btnTestAPI.Visible = !btnTestAPI.Visible;
+            }
+            else if (e.Control && e.KeyCode == Keys.F4)
+            {
+                IsEnableAutoOpenApp = !IsEnableAutoOpenApp;
+                picEnableOpenApp.Visible = !picEnableOpenApp.Visible;
+            }
+        }
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            LogHelperv2.Logger_CONTROLLER_Error($"Đóng form Form1_FormClosed với isEnableAutoApp = {IsEnableAutoOpenApp}", LogHelperv2.SaveLogFolder);
+
+            if (IsEnableAutoOpenApp)
+            {
+                Application.Restart();
+            }
+        }
+
+        private void InitDataGridView()
+        {
+            dgvAutoPaymentVehicle.RowTemplate.Height = 100;
+        }
+
         #endregion
         private bool ConnectCardReader()
         {
@@ -379,19 +422,14 @@ namespace iPGSTools
             }
         }
 
-
-
-
+        public static object lockObj = new object();
         // SỰ KIỆN AGAS 
-        public static async void UpdateGasEvent(GasModel gasModel)
+        public static async Task UpdateGasEvent(GasModel gasModel)
         {
             try
             {
-
-
                 LogHelperv2.Logger_CONTROLLER_Infor("=>>>>>>>>>>>> Nhận sự kiện Agas", LogHelperv2.SaveLogFolder, gasModel);
                 string IDAgas = Guid.NewGuid().ToString();      // IDAgas khác AgastransID
-
 
                 //Take Plate
                 await RecognPlate(gasModel);
@@ -404,7 +442,6 @@ namespace iPGSTools
                     // Lưu lỗi vào tblLog
                     MyQuery.InsertLog(EmTypeLog.LogError, MLS.Agas.InserttblAgasFail, IDAgas, "");
                 }
-
 
                 //Kiểm tra danh sách xe tích hợp thanh toán tự động có xe đang đổ xăng hay không
                 if (StaticPool.vehicleWithAutoPayments.IsContainPlate(plateNumber))
@@ -863,7 +900,7 @@ namespace iPGSTools
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception AddDGVNotEtag ex = {ex}", LogHelperv2.SaveLogFolder);
             }
-            
+
         }
         private static void AddDGVEventError(string nameEventError, string statusError)
         {
@@ -915,8 +952,6 @@ namespace iPGSTools
                 {
                     Event_Info infor = await configs.Capture_Image(StaticPool.camera, Application.StartupPath + "\\images", saveTime);
 
-
-
                     if (!string.IsNullOrEmpty(infor?._imgPath_LPR_Morning))
                     {
                         if (File.Exists(infor?._imgPath_LPR_Morning))
@@ -957,8 +992,6 @@ namespace iPGSTools
 
                 // Fix cung BS
                 plateNumber = "30H35392";
-                //plateNumber = "30H35392";
-
 
                 if (string.IsNullOrEmpty(plateNumber) || plateNumber == "")
                 {
@@ -1111,13 +1144,11 @@ namespace iPGSTools
                 }
             detectAgain:
                 {
-
                     current_LPR_Index++;
 
                     if (current_LPR_Index <= StaticPool.applicationConfig.CountDetect)
                     {
                         await Task.Delay(StaticPool.applicationConfig.TimeDelayDetect);
-
                         await Capture_Task(camera, imageFolder, eventTime);
                     }
                     else
@@ -1128,8 +1159,7 @@ namespace iPGSTools
             }
             catch (Exception ex)
             {
-
-                LogHelperv2.Logger_API_Error($"Exception Capture_Task + {ex.ToString()}", LogHelperv2.SaveLogFolder);
+                LogHelperv2.Logger_API_Error($"Exception Capture_Task + {ex}", LogHelperv2.SaveLogFolder);
             }
 
         }
@@ -1304,17 +1334,6 @@ namespace iPGSTools
 
         }
 
-        private void Form1_FormClosing_1(object sender, FormClosingEventArgs e)
-        {
-            //controller.onEvent -= Controller_onEvent;
-            LogHelperv2.Logger_CONTROLLER_Error($"Đóng form Form1_FormClosing_1 với isEnableAutoApp = {IsEnableAutoOpenApp}", LogHelperv2.SaveLogFolder);
-
-            Task.Run(() =>
-            {
-                FISHelper.StopPollingAuthorize();
-            });
-        }
-
         private async void button2_Click(object sender, EventArgs e)
         {
             //Payment payment = new Payment()
@@ -1358,11 +1377,6 @@ namespace iPGSTools
             //    dgvEtag.Rows[i].Cells["STTetag"].Value = (i + 1).ToString();
             //}
             //dgvEtag.Refresh();
-
-        }
-
-        private void siticoneDataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
 
         }
 
@@ -1422,11 +1436,6 @@ namespace iPGSTools
             //}
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
         private async void button2_Click_2(object sender, EventArgs e)
         {
             PictureBox pictureBox1 = new PictureBox();
@@ -1438,26 +1447,6 @@ namespace iPGSTools
             frm.Show();
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.F5)
-            {
-                button2.Visible = !button2.Visible;
-            }
-            else if (e.KeyCode == Keys.F6)
-            {
-                button1.Visible = !button1.Visible;
-            }
-            else if (e.KeyCode == Keys.F7)
-            {
-                btnTestAPI.Visible = !btnTestAPI.Visible;
-            }
-            else if (e.Control && e.KeyCode == Keys.F4)
-            {
-                IsEnableAutoOpenApp = !IsEnableAutoOpenApp;
-                picEnableOpenApp.Visible = !picEnableOpenApp.Visible;
-            }
-        }
 
         private async void btnTestAPI_Click(object sender, EventArgs e)
         {
@@ -1486,7 +1475,6 @@ namespace iPGSTools
                 }
             }
         }
-
         private void ToolStripThoat_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Xác nhận thoát phần mềm", "Notice", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
@@ -1495,15 +1483,18 @@ namespace iPGSTools
                 Application.Exit();
             }
         }
-        private bool IsEnableAutoOpenApp = true;
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            LogHelperv2.Logger_CONTROLLER_Error($"Đóng form Form1_FormClosed với isEnableAutoApp = {IsEnableAutoOpenApp}", LogHelperv2.SaveLogFolder);
 
-            if (IsEnableAutoOpenApp)
+
+        private async void timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+
+            if (gasModelQueue.TryDequeue(out GasModel gasModel))
             {
-                Application.Restart();
+                await UpdateGasEvent(gasModel);
             }
+
+            timer1.Enabled = true;
         }
     }
 }

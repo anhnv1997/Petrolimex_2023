@@ -4,6 +4,7 @@ using Kztek.LPR;
 using iPGSTools.Models;
 using System.Reflection;
 using iPGS.Tools;
+using System.Drawing.Imaging;
 
 namespace iPGSTools
 {
@@ -29,16 +30,48 @@ namespace iPGSTools
             {
                 if (camera != null)
                 {
-                    string folderPath = Path.Combine(imageFolder, eventTime.ToString("yyyy_MM_dd"));
-                    Directory.CreateDirectory(folderPath);
+                    try
+                    {
+                        string folderPath = Path.Combine(imageFolder, eventTime.ToString("yyyy_MM_dd"));
+                        Directory.CreateDirectory(folderPath);
 
-                    // Tạo đường dẫn đầy đủ cho ảnh
-                    string imagePath = Path.Combine(folderPath, eventTime.ToString("HH_mm_ss") + "." + eventTime.Millisecond + ".jpg");
+                        // Tạo đường dẫn đầy đủ cho ảnh
+                        string imagePath = Path.Combine(folderPath, eventTime.ToString("HH_mm_ss") + "." + eventTime.Millisecond + ".jpg");
 
-                    //string imagePath = imageFolder + "\\" + eventTime.ToString("yyyyMMdd_HHmmss") + "." + eventTime.Millisecond + ".jpg";
-                    camera.SaveCurrentVideoFrame(imagePath);
-                    if (File.Exists(imagePath))
-                        ret = imagePath;
+                        Bitmap img = camera.GetCurrentVideoFrame();
+                        img ??= camera.GetCurrentVideoFrame();
+                        ret = "";
+                        if (img == null)
+                        {
+                            ret = string.Empty;
+                        }
+                        else
+                        {
+                            using (Bitmap new_img = new Bitmap(img))
+                            {
+                                try
+                                {
+                                    img.Save(imagePath, ImageFormat.Jpeg);
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                            //string imagePath = imageFolder + "\\" + eventTime.ToString("yyyyMMdd_HHmmss") + "." + eventTime.Millisecond + ".jpg";
+                            //camera.SaveCurrentVideoFrame(imagePath);
+                            if (File.Exists(imagePath))
+                                ret = imagePath;
+                        }
+                    }
+                    catch (System.AccessViolationException ex)
+                    {
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
                 }
             });
             //if (picSaveType == EmPicSaveType.FrontPlateNumber)
@@ -47,31 +80,23 @@ namespace iPGSTools
             //    ret = frmMain.testRear;
             return ret;
         }
+        static int detectTimes = 0;
         public async Task<Event_Info> Capture_Image(Camera camera, string imageFolder, DateTime saveEventTime)
         {
             Event_Info eventInfo = null;
-            PlateDetect:
+            var task_1 = Get_Image_From_Camera(camera, imageFolder, saveEventTime);
+            var results = await Task.WhenAll(task_1);
+            if (results[0] != "")
             {
-                var task_1 = Get_Image_From_Camera(camera, imageFolder, saveEventTime);
-                var results = await Task.WhenAll(task_1);
-                if (results[0] != "")
+                eventInfo = new Event_Info();
+                try
                 {
-                    eventInfo = new Event_Info();
-                    try
-                    {
-                        eventInfo._dateTime = _systemDateTime;
-                        eventInfo._imgPath_LPR_Morning =  results[0];
-                        
-                        
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelperv2.Logger_CONTROLLER_Error($"Exception Capture_Image ex = {ex}", LogHelperv2.SaveLogFolder);
-                    }
+                    eventInfo._dateTime = _systemDateTime;
+                    eventInfo._imgPath_LPR_Morning = results[0];
                 }
-                else
+                catch (Exception ex)
                 {
-                    goto PlateDetect;
+                    LogHelperv2.Logger_CONTROLLER_Error($"Exception Capture_Image ex = {ex}", LogHelperv2.SaveLogFolder);
                 }
             }
             return eventInfo;

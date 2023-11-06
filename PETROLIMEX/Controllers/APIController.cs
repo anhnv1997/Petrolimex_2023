@@ -34,8 +34,9 @@ namespace iPGSTools.Controllers
                     return messageModel.MessageFail();
                 }
                 //UPDATE MAIN VIEW
-                Form1.UpdateGasEvent(data);
-                
+                Form1.gasModelQueue.Enqueue(data);
+                //Form1.UpdateGasEvent(data);
+
                 return messageModel.MessageSuccess();
             }
             catch (Exception ex)

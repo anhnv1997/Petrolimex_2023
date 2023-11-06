@@ -33,6 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\BaseLib\Kztek.Cameras\Kztek.Cameras.csproj" />
+    <ProjectReference Include="..\..\..\..\..\..\..\BaseLib\Kztek.RtspPlayer\Kztek.RtspPlayer\Kztek.RtspPlayer.csproj" />
     <ProjectReference Include="..\CardDispenserLibrary\CardDispenserLibrary\CardDispenserLibrary.csproj" />
     <ProjectReference Include="..\PetrolimexConfig\PetrolimexConfig.csproj" />
   </ItemGroup>
@@ -53,14 +55,8 @@
     <Reference Include="iPGS.Tools">
       <HintPath>Resource\iPGS.Tools.dll</HintPath>
     </Reference>
-    <Reference Include="Kztek.Cameras">
-      <HintPath>..\packages\Kztek.Cameras.dll</HintPath>
-    </Reference>
     <Reference Include="Kztek.LPR">
       <HintPath>..\packages\Kztek.LPR.dll</HintPath>
-    </Reference>
-    <Reference Include="Kztek.RtspPlayer">
-      <HintPath>..\packages\Kztek.RtspPlayer.dll</HintPath>
     </Reference>
     <Reference Include="Kztek.UI">
       <HintPath>..\packages\Kztek.UI.dll</HintPath>

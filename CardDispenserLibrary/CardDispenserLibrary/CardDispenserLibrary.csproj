@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Reference Include="iPGS.Tools">
-      <HintPath>..\..\packages\iPGS.Tools.dll</HintPath>
+      <HintPath>..\..\Lib_packages\iPGS.Tools.dll</HintPath>
     </Reference>
   </ItemGroup>
 

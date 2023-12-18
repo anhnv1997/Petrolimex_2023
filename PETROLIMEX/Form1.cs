@@ -39,7 +39,8 @@ namespace iPGSTools
         {
             Tyandy,
             Dahua,
-            Hanse
+            Hanse,
+            Hello
         }
         #region Forms
         public Form1()

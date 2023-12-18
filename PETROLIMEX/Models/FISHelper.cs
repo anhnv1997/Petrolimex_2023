@@ -53,7 +53,7 @@ namespace iPGSTools.Models
             try
             {
                 //string url = Properties.Settings.Default.fis_url + "/" + "queryEtag";
-                string url = "http://petrolimex-hub.petrolimex.com.vn:7073/petro/login";
+                string url = "https://petrolimex-hub.petrolimex.com.vn:7073/petro/login";
 
                 AuthorizeModel author = new AuthorizeModel();
 

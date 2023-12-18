@@ -111,30 +111,30 @@ namespace iPGSTools
                     Chanel = 1,
                     Login = StaticPool.applicationConfig.CameraUsername,
                     Password = StaticPool.applicationConfig.CameraPassword,
-                    CameraType = CameraTypes.GetType("Dahua"),
-                    //CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString()),
+                    //CameraType = CameraTypes.GetType("Dahua"),
+                    CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString()),
 
                     StreamType = StreamTypes.GetType("H264"),
                     Resolution = "1280x720",
                     UsingPlugins = 0,
                 };
-                //Camera camera = new Camera();
-                //camera.ID = "1";
-                //camera.Name = "Camera";
-                //camera.VideoSource = StaticPool.applicationConfig.CameraIP;
-                //camera.HttpPort = 80;
-                //camera.ServerPort = 80;
-                //camera.Chanel = 1;
-                //camera.Login = StaticPool.applicationConfig.CameraUsername;
-                //camera.Password = StaticPool.applicationConfig.CameraPassword;
-                //camera.CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString());
-                //camera.StreamType = StreamTypes.GetType("H264");
-                //camera.Resolution = "1280x720";
-                //camera.UsingPlugins = 0;
+                Camera camera = new Camera();
+                camera.ID = "1";
+                camera.Name = "Camera";
+                camera.VideoSource = "192.168.20.98"; //StaticPool.applicationConfig.CameraIP;
+                camera.HttpPort = 80;
+                camera.ServerPort = 80;
+                camera.Chanel = 1;
+                camera.Login = "admin";//StaticPool.applicationConfig.CameraUsername;
+                camera.Password = "admin";//StaticPool.applicationConfig.CameraPassword;
+                camera.CameraType = CameraTypes.GetType(EmCamera.Hanse.ToString());
+                camera.StreamType = StreamTypes.GetType("H264");
+                camera.Resolution = "1280x720";
+                camera.UsingPlugins = 0;
 
-                //StaticPool.listCamera = new List<Camera>();
-                //StaticPool.listCamera.Add(StaticPool.camera);
-                //StaticPool.listCamera.Add(camera);
+                StaticPool.listCamera = new List<Camera>();
+                StaticPool.listCamera.Add(StaticPool.camera);
+                StaticPool.listCamera.Add(camera);
 
                 ucCameraView ucCam = new();
 
@@ -292,7 +292,7 @@ namespace iPGSTools
                     panelCamera.Controls.Add(ucCamera);
                     ucCamera?.Invoke(() =>
                     {
-                        ucCamera.StartViewer(StaticPool.camera, CameraErrorFunc, CameraDoubleClickFunc);
+                        ucCamera.StartViewer(StaticPool.listCamera[1], CameraErrorFunc, CameraDoubleClickFunc);
                     });
                 }));
             }
@@ -1092,7 +1092,7 @@ namespace iPGSTools
                 {
                     Directory.CreateDirectory(Application.StartupPath + "\\images");
                 }
-                Task task1 = Capture_Task(StaticPool.camera, Application.StartupPath + "\\images", saveTime);
+                Task task1 = Capture_Task(StaticPool.listCamera[1], Application.StartupPath + "\\images", saveTime);
                 await task1;
             }
             catch (Exception ex)
@@ -1108,7 +1108,7 @@ namespace iPGSTools
                 {
                     Directory.CreateDirectory(Application.StartupPath + "\\TestImages");
                 }
-                Task task1 = TestCapture_Task(StaticPool.camera, Application.StartupPath + "\\TestImages", saveTime);
+                Task task1 = TestCapture_Task(StaticPool.listCamera[1], Application.StartupPath + "\\TestImages", saveTime);
                 await task1;
             }
             catch (Exception ex)

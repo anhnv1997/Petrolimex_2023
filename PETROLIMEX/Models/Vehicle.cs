@@ -1,4 +1,5 @@
-﻿using static iPGSTools.Models.QueryEtagResponse;
+﻿using PETROLIMEX.Models;
+using static iPGSTools.Models.QueryEtagResponse;
 
 namespace iPGSTools.Models
 {
@@ -43,6 +44,7 @@ namespace iPGSTools.Models
         public DateTime TimePayment { get; set; }
         public DateTime TimeLogPayment { get; set; }
 
+        public string IDVehicle { get; set; } = string.Empty;
         public string IDAgas { get; set; } = string.Empty;
         public string IDMainEvent { get; set; } = string.Empty;
         public string IDQueryEtag { get; set; } = string.Empty;
@@ -50,6 +52,7 @@ namespace iPGSTools.Models
         public string IDPumping { get; set; } = string.Empty;
         public string IDPayment { get; set; } = string.Empty;
         public string IDLogPayment { get; set; } = string.Empty;
+        public string IDCreateInvoice{ get; set; } = string.Empty;
 
         public string ImgPathPickup { get; set; } = string.Empty;
         public string ImgPathPumping { get; set; } = string.Empty;
@@ -67,11 +70,13 @@ namespace iPGSTools.Models
         public string feapresponseid { get; set; } = "";
         public string beaptransid { get; set; } = "";
 
-        public DateTime TimeIn { get; set; } = DateTime.Now;
+        public DateTime TimeIn { get; set; } = DateTime.Now;            // Biến tham chiếu Clear list danh sách chờ
         public EmVehicleStatus VehicleStatus { get; set; } = EmVehicleStatus.ChoVaoViTriDoXang;
         public long Price { get; set; }
         public float Volume { get; set; }
         public long Amount { get; set; }
+        public string Describtion{ get; set; } = string.Empty;
+        public AgasCreateInvoiceResponse createInvoiceResponse { get; set; } = new AgasCreateInvoiceResponse();
         public string GetDisplayStatus()
         {
             switch (this.VehicleStatus)

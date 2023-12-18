@@ -44,6 +44,14 @@
             this.btnExcel = new Siticone.Desktop.UI.WinForms.SiticoneButton();
             this.btnTimKiem = new Siticone.Desktop.UI.WinForms.SiticoneButton();
             this.dgvVehicleRegisted = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.picNhacCo = new System.Windows.Forms.PictureBox();
+            this.picBopCo = new System.Windows.Forms.PictureBox();
+            this.picGacCo = new System.Windows.Forms.PictureBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.STT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CreateDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StationID = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -57,17 +65,12 @@
             this.Volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StatusPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Describe = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StatusCodeInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ReasonInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ImgPathPickup = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ImgPathPumping = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ImgPathPutdown = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.picNhacCo = new System.Windows.Forms.PictureBox();
-            this.picBopCo = new System.Windows.Forms.PictureBox();
-            this.picGacCo = new System.Windows.Forms.PictureBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.splitter1 = new System.Windows.Forms.Splitter();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVehicleRegisted)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
@@ -112,7 +115,7 @@
             this.dtpFrom.Name = "dtpFrom";
             this.dtpFrom.Size = new System.Drawing.Size(146, 23);
             this.dtpFrom.TabIndex = 4;
-            this.dtpFrom.Value = new System.DateTime(2023, 5, 20, 10, 10, 0, 0);
+            this.dtpFrom.Value = new System.DateTime(2023, 11, 7, 12, 0, 0, 0);
             // 
             // label3
             // 
@@ -267,6 +270,9 @@
             this.Volume,
             this.Amount,
             this.StatusPayment,
+            this.Describe,
+            this.StatusCodeInvoice,
+            this.ReasonInvoice,
             this.ImgPathPickup,
             this.ImgPathPumping,
             this.ImgPathPutdown});
@@ -310,132 +316,6 @@
             this.dgvVehicleRegisted.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             this.dgvVehicleRegisted.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVehicleRegisted_CellClick);
             this.dgvVehicleRegisted.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dgvVehicleRegisted_DataBindingComplete);
-            // 
-            // STT
-            // 
-            this.STT.HeaderText = "STT";
-            this.STT.Name = "STT";
-            this.STT.ReadOnly = true;
-            this.STT.Width = 50;
-            // 
-            // CreateDate
-            // 
-            this.CreateDate.DataPropertyName = "CreateDate";
-            this.CreateDate.HeaderText = "Thời gian";
-            this.CreateDate.Name = "CreateDate";
-            this.CreateDate.ReadOnly = true;
-            this.CreateDate.Width = 150;
-            // 
-            // StationID
-            // 
-            this.StationID.DataPropertyName = "StationID";
-            this.StationID.HeaderText = "ID Trạm xăng ";
-            this.StationID.Name = "StationID";
-            this.StationID.ReadOnly = true;
-            this.StationID.Width = 93;
-            // 
-            // PumpID
-            // 
-            this.PumpID.DataPropertyName = "PumpID";
-            this.PumpID.HeaderText = "ID Vòi Bơm";
-            this.PumpID.Name = "PumpID";
-            this.PumpID.ReadOnly = true;
-            this.PumpID.Width = 93;
-            // 
-            // TimeAgasPumpPickup
-            // 
-            this.TimeAgasPumpPickup.DataPropertyName = "TimeAgasPumpPickup";
-            this.TimeAgasPumpPickup.HeaderText = "Thời điểm nhấc cò";
-            this.TimeAgasPumpPickup.Name = "TimeAgasPumpPickup";
-            this.TimeAgasPumpPickup.ReadOnly = true;
-            this.TimeAgasPumpPickup.Width = 120;
-            // 
-            // TimePumping
-            // 
-            this.TimePumping.DataPropertyName = "TimePumping";
-            this.TimePumping.HeaderText = "Thời điểm bơm xăng";
-            this.TimePumping.Name = "TimePumping";
-            this.TimePumping.ReadOnly = true;
-            this.TimePumping.Width = 120;
-            // 
-            // TimeAgasPutdown
-            // 
-            this.TimeAgasPutdown.DataPropertyName = "TimeAgasPutdown";
-            this.TimeAgasPutdown.HeaderText = "Thời điểm gác cò";
-            this.TimeAgasPutdown.Name = "TimeAgasPutdown";
-            this.TimeAgasPutdown.ReadOnly = true;
-            this.TimeAgasPutdown.Width = 120;
-            // 
-            // Etag
-            // 
-            this.Etag.DataPropertyName = "Etag";
-            this.Etag.HeaderText = "Mã Etag";
-            this.Etag.Name = "Etag";
-            this.Etag.ReadOnly = true;
-            this.Etag.Width = 93;
-            // 
-            // PlateNumber
-            // 
-            this.PlateNumber.DataPropertyName = "PlateNumber";
-            this.PlateNumber.HeaderText = "Biển số";
-            this.PlateNumber.Name = "PlateNumber";
-            this.PlateNumber.ReadOnly = true;
-            this.PlateNumber.Width = 93;
-            // 
-            // Price
-            // 
-            this.Price.DataPropertyName = "Price";
-            this.Price.HeaderText = "Đơn giá";
-            this.Price.Name = "Price";
-            this.Price.ReadOnly = true;
-            this.Price.Width = 93;
-            // 
-            // Volume
-            // 
-            this.Volume.DataPropertyName = "Volume";
-            this.Volume.HeaderText = "Khối lượng (lít)";
-            this.Volume.Name = "Volume";
-            this.Volume.ReadOnly = true;
-            this.Volume.Width = 93;
-            // 
-            // Amount
-            // 
-            this.Amount.DataPropertyName = "Amount";
-            this.Amount.HeaderText = "Tổng tiền";
-            this.Amount.Name = "Amount";
-            this.Amount.ReadOnly = true;
-            // 
-            // StatusPayment
-            // 
-            this.StatusPayment.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.StatusPayment.DataPropertyName = "StatusPayment";
-            this.StatusPayment.HeaderText = "Trạng thái";
-            this.StatusPayment.Name = "StatusPayment";
-            this.StatusPayment.ReadOnly = true;
-            // 
-            // ImgPathPickup
-            // 
-            this.ImgPathPickup.DataPropertyName = "ImgPathPickup";
-            this.ImgPathPickup.HeaderText = "PathNhacCo";
-            this.ImgPathPickup.Name = "ImgPathPickup";
-            this.ImgPathPickup.ReadOnly = true;
-            this.ImgPathPickup.Visible = false;
-            // 
-            // ImgPathPumping
-            // 
-            this.ImgPathPumping.DataPropertyName = "ImgPathPumping";
-            this.ImgPathPumping.HeaderText = "PathBopCo";
-            this.ImgPathPumping.Name = "ImgPathPumping";
-            this.ImgPathPumping.ReadOnly = true;
-            this.ImgPathPumping.Visible = false;
-            // 
-            // ImgPathPutdown
-            // 
-            this.ImgPathPutdown.DataPropertyName = "ImgPathPutdown";
-            this.ImgPathPutdown.HeaderText = "PathGacCo";
-            this.ImgPathPutdown.Name = "ImgPathPutdown";
-            this.ImgPathPutdown.ReadOnly = true;
-            this.ImgPathPutdown.Visible = false;
             // 
             // tableLayoutPanel1
             // 
@@ -533,6 +413,153 @@
             this.splitter1.TabIndex = 4;
             this.splitter1.TabStop = false;
             // 
+            // STT
+            // 
+            this.STT.HeaderText = "STT";
+            this.STT.Name = "STT";
+            this.STT.ReadOnly = true;
+            this.STT.Width = 50;
+            // 
+            // CreateDate
+            // 
+            this.CreateDate.DataPropertyName = "CreateDate";
+            this.CreateDate.HeaderText = "Thời gian";
+            this.CreateDate.Name = "CreateDate";
+            this.CreateDate.ReadOnly = true;
+            this.CreateDate.Width = 150;
+            // 
+            // StationID
+            // 
+            this.StationID.DataPropertyName = "StationID";
+            this.StationID.HeaderText = "ID Trạm xăng ";
+            this.StationID.Name = "StationID";
+            this.StationID.ReadOnly = true;
+            this.StationID.Width = 77;
+            // 
+            // PumpID
+            // 
+            this.PumpID.DataPropertyName = "PumpID";
+            this.PumpID.HeaderText = "ID Vòi Bơm";
+            this.PumpID.Name = "PumpID";
+            this.PumpID.ReadOnly = true;
+            this.PumpID.Width = 68;
+            // 
+            // TimeAgasPumpPickup
+            // 
+            this.TimeAgasPumpPickup.DataPropertyName = "TimeAgasPumpPickup";
+            this.TimeAgasPumpPickup.HeaderText = "Thời điểm nhấc cò";
+            this.TimeAgasPumpPickup.Name = "TimeAgasPumpPickup";
+            this.TimeAgasPumpPickup.ReadOnly = true;
+            this.TimeAgasPumpPickup.Width = 150;
+            // 
+            // TimePumping
+            // 
+            this.TimePumping.DataPropertyName = "TimePumping";
+            this.TimePumping.HeaderText = "Thời điểm bơm xăng";
+            this.TimePumping.Name = "TimePumping";
+            this.TimePumping.ReadOnly = true;
+            this.TimePumping.Width = 150;
+            // 
+            // TimeAgasPutdown
+            // 
+            this.TimeAgasPutdown.DataPropertyName = "TimeAgasPutdown";
+            this.TimeAgasPutdown.HeaderText = "Thời điểm gác cò";
+            this.TimeAgasPutdown.Name = "TimeAgasPutdown";
+            this.TimeAgasPutdown.ReadOnly = true;
+            this.TimeAgasPutdown.Width = 150;
+            // 
+            // Etag
+            // 
+            this.Etag.DataPropertyName = "Etag";
+            this.Etag.HeaderText = "Mã Etag";
+            this.Etag.Name = "Etag";
+            this.Etag.ReadOnly = true;
+            this.Etag.Width = 200;
+            // 
+            // PlateNumber
+            // 
+            this.PlateNumber.DataPropertyName = "PlateNumber";
+            this.PlateNumber.HeaderText = "Biển số";
+            this.PlateNumber.Name = "PlateNumber";
+            this.PlateNumber.ReadOnly = true;
+            // 
+            // Price
+            // 
+            this.Price.DataPropertyName = "Price";
+            this.Price.HeaderText = "Đơn giá";
+            this.Price.Name = "Price";
+            this.Price.ReadOnly = true;
+            // 
+            // Volume
+            // 
+            this.Volume.DataPropertyName = "Volume";
+            this.Volume.HeaderText = "Khối lượng (lít)";
+            this.Volume.Name = "Volume";
+            this.Volume.ReadOnly = true;
+            // 
+            // Amount
+            // 
+            this.Amount.DataPropertyName = "Amount";
+            this.Amount.HeaderText = "Tổng tiền";
+            this.Amount.Name = "Amount";
+            this.Amount.ReadOnly = true;
+            // 
+            // StatusPayment
+            // 
+            this.StatusPayment.DataPropertyName = "StatusPayment";
+            this.StatusPayment.HeaderText = "Trạng thái";
+            this.StatusPayment.Name = "StatusPayment";
+            this.StatusPayment.ReadOnly = true;
+            this.StatusPayment.Width = 150;
+            // 
+            // Describe
+            // 
+            this.Describe.DataPropertyName = "Describe";
+            this.Describe.HeaderText = "Lý do";
+            this.Describe.Name = "Describe";
+            this.Describe.ReadOnly = true;
+            this.Describe.Width = 200;
+            // 
+            // StatusCodeInvoice
+            // 
+            this.StatusCodeInvoice.DataPropertyName = "StatusCodeInvoice";
+            this.StatusCodeInvoice.HeaderText = "Hóa đơn";
+            this.StatusCodeInvoice.Name = "StatusCodeInvoice";
+            this.StatusCodeInvoice.ReadOnly = true;
+            this.StatusCodeInvoice.Width = 150;
+            // 
+            // ReasonInvoice
+            // 
+            this.ReasonInvoice.DataPropertyName = "ReasonInvoice";
+            this.ReasonInvoice.HeaderText = "Ghi chú";
+            this.ReasonInvoice.Name = "ReasonInvoice";
+            this.ReasonInvoice.ReadOnly = true;
+            this.ReasonInvoice.Width = 300;
+            // 
+            // ImgPathPickup
+            // 
+            this.ImgPathPickup.DataPropertyName = "ImgPathPickup";
+            this.ImgPathPickup.HeaderText = "PathNhacCo";
+            this.ImgPathPickup.Name = "ImgPathPickup";
+            this.ImgPathPickup.ReadOnly = true;
+            this.ImgPathPickup.Visible = false;
+            // 
+            // ImgPathPumping
+            // 
+            this.ImgPathPumping.DataPropertyName = "ImgPathPumping";
+            this.ImgPathPumping.HeaderText = "PathBopCo";
+            this.ImgPathPumping.Name = "ImgPathPumping";
+            this.ImgPathPumping.ReadOnly = true;
+            this.ImgPathPumping.Visible = false;
+            // 
+            // ImgPathPutdown
+            // 
+            this.ImgPathPutdown.DataPropertyName = "ImgPathPutdown";
+            this.ImgPathPutdown.HeaderText = "PathGacCo";
+            this.ImgPathPutdown.Name = "ImgPathPutdown";
+            this.ImgPathPutdown.ReadOnly = true;
+            this.ImgPathPutdown.Visible = false;
+            // 
             // frmReportVehiceRegisted
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -579,6 +606,9 @@
         private Label label4;
         private Label label5;
         private Label label6;
+        private DateTimePicker dtpTo;
+        private DateTimePicker dtpFrom;
+        private DataGridViewTextBoxColumn IDInvoice;
         private DataGridViewTextBoxColumn STT;
         private DataGridViewTextBoxColumn CreateDate;
         private DataGridViewTextBoxColumn StationID;
@@ -592,10 +622,11 @@
         private DataGridViewTextBoxColumn Volume;
         private DataGridViewTextBoxColumn Amount;
         private DataGridViewTextBoxColumn StatusPayment;
+        private DataGridViewTextBoxColumn Describe;
+        private DataGridViewTextBoxColumn StatusCodeInvoice;
+        private DataGridViewTextBoxColumn ReasonInvoice;
         private DataGridViewTextBoxColumn ImgPathPickup;
         private DataGridViewTextBoxColumn ImgPathPumping;
         private DataGridViewTextBoxColumn ImgPathPutdown;
-        private DateTimePicker dtpTo;
-        private DateTimePicker dtpFrom;
     }
 }

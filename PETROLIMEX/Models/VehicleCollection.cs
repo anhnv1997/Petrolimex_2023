@@ -1,4 +1,5 @@
 ﻿using PETROLIMEX;
+using PETROLIMEX.Helper;
 using System.Collections;
 
 namespace iPGSTools.Models
@@ -72,6 +73,25 @@ namespace iPGSTools.Models
                 }
             }
         }
+        //
+        public bool GetVehicleIfOverTime(int timeAboutReset, ref Vehicle vehicle_remove)        // phút
+        {
+            lock (lockObj)
+            {
+                foreach (Vehicle vehicle in InnerList)
+                {
+                    if (vehicle.TimeIn.AddMinutes(timeAboutReset) < DateTime.Now)
+                    {
+                        //InnerList.Remove(vehicle);
+                        vehicle_remove = vehicle;
+                        LogHelperv2.Logger_Camera_Infor($"Phát hiện plate {vehicle_remove.platenumber} có time = {vehicle_remove.TimeIn} > gửi quá {StaticPool.applicationConfig.TimeClearList} => List = {InnerList.Count}", LogHelperv2.SaveLogFolder);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+       
         public bool IsContainPlate(string plate)
         {
             lock (lockObj)

@@ -1,10 +1,8 @@
-﻿using GeneralTool;
-using Kztek.Cameras;
+﻿using Kztek.Cameras;
 using Kztek.LPR;
 using iPGSTools.Models;
-using System.Reflection;
-using iPGS.Tools;
 using System.Drawing.Imaging;
+using PETROLIMEX.Helper;
 
 namespace iPGSTools
 {
@@ -23,10 +21,13 @@ namespace iPGSTools
         #endregion
 
         #region Capture Image from Camera
+        public static object lockObj = new object();
         public async Task<string> Get_Image_From_Camera(Camera camera, string imageFolder, DateTime eventTime)
         {
-            string ret = String.Empty;
-            await Task.Run(() =>
+            //lock (lockObj)
+            {
+                string ret = String.Empty;
+                await Task.Run(() =>
             {
                 if (camera != null)
                 {
@@ -74,11 +75,14 @@ namespace iPGSTools
 
                 }
             });
-            //if (picSaveType == EmPicSaveType.FrontPlateNumber)
-            //    ret = frmMain.testFront;//"D:\\LPR TEST\\New folder (33)\\20220801_090107.500_FrontPlateNumber.jpg";
-            //else
-            //    ret = frmMain.testRear;
-            return ret;
+                //);
+                //if (picSaveType == EmPicSaveType.FrontPlateNumber)
+                //    ret = frmMain.testFront;//"D:\\LPR TEST\\New folder (33)\\20220801_090107.500_FrontPlateNumber.jpg";
+                //else
+                //    ret = frmMain.testRear;
+                return ret;
+            }
+          
         }
         static int detectTimes = 0;
         public async Task<Event_Info> Capture_Image(Camera camera, string imageFolder, DateTime saveEventTime)

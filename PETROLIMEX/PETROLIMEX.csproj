@@ -33,8 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\..\BaseLib\Kztek.Cameras\Kztek.Cameras.csproj" />
-    <ProjectReference Include="..\..\..\..\..\..\..\BaseLib\Kztek.RtspPlayer\Kztek.RtspPlayer\Kztek.RtspPlayer.csproj" />
     <ProjectReference Include="..\CardDispenserLibrary\CardDispenserLibrary\CardDispenserLibrary.csproj" />
     <ProjectReference Include="..\PetrolimexConfig\PetrolimexConfig.csproj" />
   </ItemGroup>
@@ -52,8 +50,8 @@
     <Reference Include="Futech.LPR">
       <HintPath>Resource\Futech.LPR.dll</HintPath>
     </Reference>
-    <Reference Include="iPGS.Tools">
-      <HintPath>Resource\iPGS.Tools.dll</HintPath>
+    <Reference Include="Kztek.Cameras">
+      <HintPath>..\Lib_packages\Kztek.Cameras.dll</HintPath>
     </Reference>
     <Reference Include="Kztek.LPR">
       <HintPath>..\packages\Kztek.LPR.dll</HintPath>
@@ -68,10 +66,10 @@
       <HintPath>..\packages\RtspClientSharp.dll</HintPath>
     </Reference>
     <Reference Include="SimpleLPR2">
-      <HintPath>..\packages\SimpleLPR2.dll</HintPath>
+      <HintPath>..\Lib_packages\SimpleLPR2.dll</HintPath>
     </Reference>
     <Reference Include="SimpleLPR3">
-      <HintPath>..\packages\SimpleLPR3.dll</HintPath>
+      <HintPath>..\Lib_packages\SimpleLPR3.dll</HintPath>
     </Reference>
   </ItemGroup>
 

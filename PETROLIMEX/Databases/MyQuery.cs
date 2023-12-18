@@ -1,12 +1,15 @@
 ﻿using CardDispenserLibrary;
-using iPGS.Tools;
+
 //using iPGS.Tools;
 
 using iPGSTools.Helper;
 using iPGSTools.Models;
 using PETROLIMEX;
+using PETROLIMEX.Helper;
+using PETROLIMEX.Models;
 using System.Data;
 using System.Text;
+using static iPGSTools.Helper.MLS;
 using static iPGSTools.Models.Vehicle;
 
 namespace iPGSTools.Databases
@@ -15,8 +18,8 @@ namespace iPGSTools.Databases
     {
         public static bool InsertQueryEtag(Vehicle vehicle)
         {
-			try
-			{
+            try
+            {
                 vehicle.IDQueryEtag = Guid.NewGuid().ToString();
                 vehicle.TimeQueryEtag = DateTime.Now;
 
@@ -31,11 +34,11 @@ namespace iPGSTools.Databases
                 }
                 return false;
             }
-			catch (Exception ex)
-			{
+            catch (Exception ex)
+            {
                 LogHelperv2.Logger_CONTROLLER_Error($"Query dữ liệu CreateQueryEtag thất bại + {ex.ToString()}", LogHelperv2.SaveLogFolder);
                 return false;
-			}
+            }
         }
         public static bool InsertQueryAgas(GasModel gasModel, string IDAgas, string imagePath)
         {
@@ -46,7 +49,7 @@ namespace iPGSTools.Databases
                 sb.Append("insert into tblAgasEvent(IDAgas, CreateDate, PumpStatus, TimeStamp, AgastransID, PumpID, StationID, Price, Volume, Amount, ReasonID, IsDelete, ImgPath) ");
                 sb.Append($"values ('{IDAgas}', '{DateTime.Now}','{(int)gasModel.pumpstatus}', '{gasModel.timestamp}', '{gasModel.agastransid}', '{gasModel.pumpid}', '{gasModel.stationid}', ");
                 sb.Append($"'{gasModel.price}', '{gasModel.volume}', '{gasModel.amount}', '{gasModel.reasonid}', '{false}', '{imagePath}')");
-                
+
                 if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
                 {
                     LogHelperv2.Logger_CONTROLLER_Infor("=>>>>>>>>>>>> Lưu vào db QueryAgas thành công", LogHelperv2.SaveLogFolder, gasModel);
@@ -142,13 +145,13 @@ namespace iPGSTools.Databases
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception CheckProcessError thất bại + {ex.ToString()}", LogHelperv2.SaveLogFolder);
                 return false;
             }
-            
+
         }
         public static bool InsertMainEvent(Vehicle vehicle, GasModel gasModel)
         {
             try
             {
-                
+
 
                 vehicle.IDMainEvent = Guid.NewGuid().ToString();
                 string stationName = StaticPool.applicationConfig.StationName ?? "";
@@ -324,7 +327,7 @@ namespace iPGSTools.Databases
                 sb.Append($"update tblMainEvent ");
                 sb.Append($"set TimePumping = '{vehicle.TimePumping}', AgasPumpingID = '{vehicle.IDPumping}', Price = '{gasModel.price}', Volume = '{gasModel.volume}', Amount = '{gasModel.amount}', ImgPathPumping = '{vehicle.ImgPathPumping}' ");
                 sb.Append($"where ID = '{vehicle.IDMainEvent}'");
-                
+
                 if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
                 {
                     return true;
@@ -344,7 +347,7 @@ namespace iPGSTools.Databases
                 StringBuilder sb = new StringBuilder();
                 sb.Append($"update tblMainEvent ");
                 sb.Append($"set TimePayment = '{vehicle.TimePayment}', PaymentID = '{vehicle.IDPayment}', Price = '{gasModel.price}', Volume = '{gasModel.volume}', Amount = '{gasModel.amount}', ");
-                sb.Append($"StatusPayment = '{statusPayment}', IsFinish = '{IsFinish}', AgasPutdownID = '{vehicle.IDAgas}', TimeAgasPutdown = '{vehicle.TimeAgas}', ImgPathPutdown = '{vehicle.ImgPathPutdown}' ");
+                sb.Append($"StatusPayment = '{statusPayment}',Describe = N'{vehicle.Describtion}', IsFinish = '{IsFinish}', AgasPutdownID = '{vehicle.IDAgas}', TimeAgasPutdown = '{vehicle.TimeAgas}', ImgPathPutdown = '{vehicle.ImgPathPutdown}', InvoiceID = '{vehicle.IDCreateInvoice}' ");
                 sb.Append($"where ID = '{vehicle.IDMainEvent}'");
 
                 if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
@@ -430,7 +433,30 @@ namespace iPGSTools.Databases
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append($"insert into tblLog (LogID, LogDateTime, LogType, Message, Describe, PCName, IDAgas, IDEtag, IsDelete) ");
-                sb.Append($"values ('{Guid.NewGuid().ToString()}','{DateTime.Now}','{emTypeLog}',N'{mess}','{""}','{Environment.MachineName}','{idAgas}','{Etag}','{false}')");
+                sb.Append($"values ('{Guid.NewGuid().ToString()}','{DateTime.Now}',N'{emTypeLog}',N'{mess}','{""}','{Environment.MachineName}','{idAgas}','{Etag}','{false}')");
+
+                if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogHelperv2.Logger_CONTROLLER_Error($"Exception InsertLog + {ex.ToString()}", LogHelperv2.SaveLogFolder);
+                return false;
+            }
+        }
+        public static bool InsertCreateInvoice(Vehicle vehicle)
+        {
+            try
+            {
+                vehicle.IDCreateInvoice = Guid.NewGuid().ToString();
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"insert into tblCreateInvoice ([IDInvoice], [CreatDate], [ApiName], [AgasTransID], [ResponseDate], [StatusCode], [linkref], [refcode], [reason], [checksum]) ");
+                sb.Append($"values ('{vehicle.IDCreateInvoice}','{DateTime.Now}','{vehicle.createInvoiceResponse.apiname}',N'{vehicle.createInvoiceResponse.agasTransId}','{vehicle.createInvoiceResponse.responsedate}',");
+                sb.Append($"'{vehicle.createInvoiceResponse.statuscode}','{vehicle.createInvoiceResponse.linkref}','{vehicle.createInvoiceResponse.refcode}',N'{vehicle.createInvoiceResponse.reason}', '{vehicle.createInvoiceResponse.checksum}')");
 
                 if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
                 {

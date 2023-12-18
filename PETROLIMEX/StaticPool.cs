@@ -21,6 +21,8 @@ namespace PETROLIMEX
 
         public static ApplicationConfig applicationConfig;
         public static Camera camera;
+        public static List<Camera> listCamera;
+
         public static CarANPR carANPR1 = null;
         public static Futech.LPR.LPREngine lprapi;
 

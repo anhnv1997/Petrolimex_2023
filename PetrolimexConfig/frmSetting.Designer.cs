@@ -77,21 +77,26 @@ namespace PetrolimexConfig
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.txbCreateInvoicePort = new System.Windows.Forms.TextBox();
             this.txbCreateInvoiceHost = new System.Windows.Forms.TextBox();
+            this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.label21 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.txbTimeClearList = new System.Windows.Forms.TextBox();
             this.txbTimeDelayDetect = new System.Windows.Forms.TextBox();
             this.txbCountDetect = new System.Windows.Forms.TextBox();
             this.txtStationName = new System.Windows.Forms.TextBox();
             this.txtStationID = new System.Windows.Forms.TextBox();
             this.pnlBody = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.txbCreateInvoicePort = new System.Windows.Forms.TextBox();
-            this.label23 = new System.Windows.Forms.Label();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numCameraPort)).BeginInit();
@@ -108,8 +113,11 @@ namespace PetrolimexConfig
             this.tabPage4.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.tabPage5.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             this.pnlBody.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.groupBox8.SuspendLayout();
+            this.groupBox9.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -629,6 +637,14 @@ namespace PetrolimexConfig
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "CreateInvoice";
             // 
+            // txbCreateInvoicePort
+            // 
+            this.txbCreateInvoicePort.Location = new System.Drawing.Point(89, 18);
+            this.txbCreateInvoicePort.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txbCreateInvoicePort.Name = "txbCreateInvoicePort";
+            this.txbCreateInvoicePort.Size = new System.Drawing.Size(94, 23);
+            this.txbCreateInvoicePort.TabIndex = 15;
+            // 
             // txbCreateInvoiceHost
             // 
             this.txbCreateInvoiceHost.Location = new System.Drawing.Point(89, 48);
@@ -636,6 +652,15 @@ namespace PetrolimexConfig
             this.txbCreateInvoiceHost.Name = "txbCreateInvoiceHost";
             this.txbCreateInvoiceHost.Size = new System.Drawing.Size(380, 23);
             this.txbCreateInvoiceHost.TabIndex = 15;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(27, 48);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(32, 15);
+            this.label23.TabIndex = 3;
+            this.label23.Text = "Host";
             // 
             // label22
             // 
@@ -648,14 +673,9 @@ namespace PetrolimexConfig
             // 
             // tabPage5
             // 
-            this.tabPage5.Controls.Add(this.label21);
-            this.tabPage5.Controls.Add(this.label20);
-            this.tabPage5.Controls.Add(this.label19);
-            this.tabPage5.Controls.Add(this.label18);
-            this.tabPage5.Controls.Add(this.txbTimeDelayDetect);
-            this.tabPage5.Controls.Add(this.txbCountDetect);
-            this.tabPage5.Controls.Add(this.txtStationName);
-            this.tabPage5.Controls.Add(this.txtStationID);
+            this.tabPage5.Controls.Add(this.groupBox8);
+            this.tabPage5.Controls.Add(this.groupBox9);
+            this.tabPage5.Controls.Add(this.groupBox7);
             this.tabPage5.Location = new System.Drawing.Point(184, 4);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
@@ -664,20 +684,43 @@ namespace PetrolimexConfig
             this.tabPage5.Text = "Other";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.label18);
+            this.groupBox7.Controls.Add(this.txtStationID);
+            this.groupBox7.Controls.Add(this.txtStationName);
+            this.groupBox7.Controls.Add(this.label19);
+            this.groupBox7.Location = new System.Drawing.Point(22, 20);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(237, 100);
+            this.groupBox7.TabIndex = 2;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "PLX";
+            // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(255, 85);
+            this.label21.Location = new System.Drawing.Point(6, 62);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(123, 15);
             this.label21.TabIndex = 1;
             this.label21.Text = "TimeDelayDetect (ms)";
             this.label21.Click += new System.EventHandler(this.label19_Click);
             // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(14, 41);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(127, 15);
+            this.label24.TabIndex = 1;
+            this.label24.Text = "TimeClearList (minute)";
+            this.label24.Click += new System.EventHandler(this.label19_Click);
+            // 
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(44, 82);
+            this.label20.Location = new System.Drawing.Point(26, 25);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(77, 15);
             this.label20.TabIndex = 1;
@@ -687,7 +730,7 @@ namespace PetrolimexConfig
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(275, 31);
+            this.label19.Location = new System.Drawing.Point(14, 59);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(99, 15);
             this.label19.TabIndex = 1;
@@ -697,36 +740,43 @@ namespace PetrolimexConfig
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(51, 28);
+            this.label18.Location = new System.Drawing.Point(21, 30);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(77, 15);
             this.label18.TabIndex = 1;
             this.label18.Text = "PLX Stationid";
             // 
+            // txbTimeClearList
+            // 
+            this.txbTimeClearList.Location = new System.Drawing.Point(147, 33);
+            this.txbTimeClearList.Name = "txbTimeClearList";
+            this.txbTimeClearList.Size = new System.Drawing.Size(100, 23);
+            this.txbTimeClearList.TabIndex = 0;
+            // 
             // txbTimeDelayDetect
             // 
-            this.txbTimeDelayDetect.Location = new System.Drawing.Point(380, 82);
+            this.txbTimeDelayDetect.Location = new System.Drawing.Point(131, 59);
             this.txbTimeDelayDetect.Name = "txbTimeDelayDetect";
             this.txbTimeDelayDetect.Size = new System.Drawing.Size(100, 23);
             this.txbTimeDelayDetect.TabIndex = 0;
             // 
             // txbCountDetect
             // 
-            this.txbCountDetect.Location = new System.Drawing.Point(149, 79);
+            this.txbCountDetect.Location = new System.Drawing.Point(131, 22);
             this.txbCountDetect.Name = "txbCountDetect";
             this.txbCountDetect.Size = new System.Drawing.Size(100, 23);
             this.txbCountDetect.TabIndex = 0;
             // 
             // txtStationName
             // 
-            this.txtStationName.Location = new System.Drawing.Point(380, 28);
+            this.txtStationName.Location = new System.Drawing.Point(119, 56);
             this.txtStationName.Name = "txtStationName";
             this.txtStationName.Size = new System.Drawing.Size(100, 23);
             this.txtStationName.TabIndex = 0;
             // 
             // txtStationID
             // 
-            this.txtStationID.Location = new System.Drawing.Point(149, 25);
+            this.txtStationID.Location = new System.Drawing.Point(119, 27);
             this.txtStationID.Name = "txtStationID";
             this.txtStationID.Size = new System.Drawing.Size(100, 23);
             this.txtStationID.TabIndex = 0;
@@ -750,22 +800,29 @@ namespace PetrolimexConfig
             this.panel2.Size = new System.Drawing.Size(759, 36);
             this.panel2.TabIndex = 6;
             // 
-            // txbCreateInvoicePort
+            // groupBox8
             // 
-            this.txbCreateInvoicePort.Location = new System.Drawing.Point(89, 18);
-            this.txbCreateInvoicePort.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txbCreateInvoicePort.Name = "txbCreateInvoicePort";
-            this.txbCreateInvoicePort.Size = new System.Drawing.Size(94, 23);
-            this.txbCreateInvoicePort.TabIndex = 15;
+            this.groupBox8.Controls.Add(this.txbCountDetect);
+            this.groupBox8.Controls.Add(this.label20);
+            this.groupBox8.Controls.Add(this.label21);
+            this.groupBox8.Controls.Add(this.txbTimeDelayDetect);
+            this.groupBox8.Location = new System.Drawing.Point(281, 20);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(237, 100);
+            this.groupBox8.TabIndex = 2;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Detect";
             // 
-            // label23
+            // groupBox9
             // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(27, 48);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(32, 15);
-            this.label23.TabIndex = 3;
-            this.label23.Text = "Host";
+            this.groupBox9.Controls.Add(this.txbTimeClearList);
+            this.groupBox9.Controls.Add(this.label24);
+            this.groupBox9.Location = new System.Drawing.Point(141, 145);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(268, 100);
+            this.groupBox9.TabIndex = 2;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "WaitingList";
             // 
             // frmSetting
             // 
@@ -802,9 +859,14 @@ namespace PetrolimexConfig
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.tabPage5.ResumeLayout(false);
-            this.tabPage5.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             this.pnlBody.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
+            this.groupBox8.ResumeLayout(false);
+            this.groupBox8.PerformLayout();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -872,5 +934,10 @@ namespace PetrolimexConfig
         private Label label22;
         private TextBox txbCreateInvoicePort;
         private Label label23;
+        private GroupBox groupBox7;
+        private Label label24;
+        private TextBox txbTimeClearList;
+        private GroupBox groupBox8;
+        private GroupBox groupBox9;
     }
 }

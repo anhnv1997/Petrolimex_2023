@@ -72,6 +72,7 @@ namespace PetrolimexConfig
             txbCountDetect.Text = systemInfo.CountDetect.ToString();
             txbTimeDelayDetect.Text = systemInfo.TimeDelayDetect.ToString();
 
+            txbTimeClearList.Text = systemInfo.TimeClearList.ToString();
         }
 
         private SQLConfig LoadSQLConfig()
@@ -161,6 +162,8 @@ namespace PetrolimexConfig
                 StationName = txtStationName.Text,
                 CountDetect = int.Parse(txbCountDetect.Text),
                 TimeDelayDetect = int.Parse(txbTimeDelayDetect.Text),
+
+                TimeClearList = int.Parse(txbTimeClearList.Text),
             };
             systemlist.Add(sys);
 

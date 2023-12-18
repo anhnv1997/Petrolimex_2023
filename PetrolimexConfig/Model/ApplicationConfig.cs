@@ -33,7 +33,7 @@ namespace PetrolimexConfig.Model
         public int CountDetect { get; set; } = 3;
         public int TimeDelayDetect { get; set; } = 100;
 
-
+        public int TimeClearList { get; set; } = 0;
 
         public ApplicationConfig()
         {

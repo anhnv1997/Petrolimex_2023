@@ -1,17 +1,6 @@
-﻿using iPGS.Tools;
-using iPGS.Tools.XMLHelpers;
-using IPGS.Object.Databases;
-using iPGSTools;
+﻿using IPGS.Object.Databases;
+using PETROLIMEX.Helper;
 using PetrolimexConfig.Model;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace PETROLIMEX.Forms
 {

@@ -1,7 +1,7 @@
-﻿using iPGS.Tools;
-using System.Data;
+﻿using System.Data;
 using System.Text;
 using iPGSTools.Helper;
+using PETROLIMEX.Helper;
 
 namespace PETROLIMEX.Forms
 {
@@ -35,8 +35,11 @@ namespace PETROLIMEX.Forms
                 sb.Append($"   WHEN StatusPayment = 1 THEN N'{case1}' ");
                 sb.Append($"   WHEN StatusPayment = 2 THEN N'{case2}' ");
                 sb.Append("   ELSE 'Unknown' ");
-                sb.Append("END AS StatusPayment ");
-                sb.Append($"from tblMainEvent ");
+                sb.Append("END AS StatusPayment, ");
+                sb.Append("Describe, ");
+                sb.Append("CASE WHEN StatusCode = '00' THEN N'Tạo hóa đơn thành công' WHEN StatusCode = '01' THEN N'Tạo hóa đơn thất bại' WHEN StatusCode = '02' THEN N'Ngoại lệ' END AS StatusCodeInvoice, ");
+                sb.Append("HD.reason as ReasonInvoice ");
+                sb.Append($"from tblMainEvent left join tblCreateInvoice as HD on tblMainEvent.InvoiceID = convert(nvarchar(50), HD.IDInvoice) ");
                 sb.Append($"where IsDelete = '{0}' ");
 
                 // Loại xe đăng ký 
@@ -69,7 +72,7 @@ namespace PETROLIMEX.Forms
                 }
                 sb.Append($" and TimeAgasPumpPickup != '' and TimePumping != '' and TimeAgasPutdown != '' and PlateNumber != '' ");
                 sb.Append($" and CreateDate between '{dtpFrom.Value}' and '{dtpTo.Value}'");
-                sb.Append($" order by CreateDate asc");
+                sb.Append($" order by CreateDate DESC");
 
                 DataTable dt = StaticPool.mdb.FillData(sb.ToString());
                 if (dt != null && dt.Rows.Count > 0)
@@ -100,6 +103,8 @@ namespace PETROLIMEX.Forms
 
         private void frmReportVehiceRegisted_Load(object sender, EventArgs e)
         {
+            cbbvehicleType.Items.Clear();
+            cbbType.Items.Clear();
             for (int i = 0; i < TypeVehicle.Length; i++)
             {
                 cbbvehicleType.Items.Add(TypeVehicle[i]);
@@ -109,7 +114,9 @@ namespace PETROLIMEX.Forms
             {
                 cbbType.Items.Add(TypeLooking[i]);
             }
-            
+
+            dtpFrom.Value = DateTime.Now.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
+            dtpTo.Value = DateTime.Now;
             //LoadDGV();
         }
 
@@ -152,6 +159,11 @@ namespace PETROLIMEX.Forms
                 {
                     // Trỏ hàng hiện tại đến hàng theo ID textbox 
                     dgvVehicleRegisted.Rows[i].Cells[0].Value = (i + 1).ToString();
+
+                    if (dgvVehicleRegisted.Rows[i].Cells["StatusPayment"].Value.ToString() == "Thanh toán thất bại")
+                    {
+                        dgvVehicleRegisted.Rows[i].Cells["StatusPayment"].Style.ForeColor = Color.Red;
+                    }
                 }
             }
         }
@@ -177,6 +189,10 @@ namespace PETROLIMEX.Forms
 
         private void dgvVehicleRegisted_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if(e.RowIndex == -1)
+            {
+                return;
+            }
             int i;
             i = dgvVehicleRegisted.CurrentRow.Index;
             //frm.Invoke(new Action(() =>

@@ -1,10 +1,6 @@
-﻿using DocumentFormat.OpenXml.Office2016.Excel;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Futech.LPR;
-using iPGS.Tools;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using PETROLIMEX;
+using PETROLIMEX.Helper;
 using PETROLIMEX.Models;
 using RestSharp;
 using System.Net.Sockets;
@@ -72,12 +68,12 @@ namespace iPGSTools.Models
                     { "username", author.username },
                     { "password", author.password }
                 };
-                
+
                 LogHelperv2.Logger_API_Infor("Send Login", LogHelperv2.SaveLogFolder, loginData);
 
-                
+
                 var result = await GeneralJsonAPILogin(url, loginData, headerValues, new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
-                
+
                 if (result.IsSuccessful)
                 {
                     try
@@ -87,7 +83,7 @@ namespace iPGSTools.Models
                         LogHelperv2.Logger_API_Infor("Login thành công received: " + result.Content, LogHelperv2.SaveLogFolder, loginData);
 
                         string token = responseContent.data.ToString();
-                        
+
                         return token;
 
                     }
@@ -119,7 +115,7 @@ namespace iPGSTools.Models
                 feaprequestid = _feapRequestId,
                 stationid = _stationId,
             };
-            
+
             string url = StaticPool.applicationConfig.FIS_URL + "/" + "queryEtag";
 
             Dictionary<string, string> headerValues = new Dictionary<string, string>()
@@ -128,7 +124,7 @@ namespace iPGSTools.Models
             };
             LogHelperv2.Logger_API_Infor("Send QueryEtag11", LogHelperv2.SaveLogFolder, etagData);
 
-            var result = await ApiHelper.ApiHelpers.GeneralJsonAPI(url, etagData, headerValues, new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
+            var result = await ApiHelpers.GeneralJsonAPI(url, etagData, headerValues, new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
             if (result.IsSuccessful)
             {
                 try
@@ -147,9 +143,10 @@ namespace iPGSTools.Models
 
                     QueryEtagResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<QueryEtagResponse>(responseContent.data.ToString());
 
-                    if(response.autopayment != null)
+                    if (response.autopayment != null)
                     {
                         Vehicle vehicle = new Vehicle();
+                        vehicle.IDVehicle = Guid.NewGuid().ToString();
                         vehicle.etag = response.etag;
                         vehicle.etagControllerID = _etagId;
                         vehicle.platenumber = response.platenumber;
@@ -165,7 +162,7 @@ namespace iPGSTools.Models
                         return null;
                     }
 
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -180,7 +177,7 @@ namespace iPGSTools.Models
 
         public static async Task<OrderResponse> CreateOrder(Order orderData)
         {
-            string createOrderUrl = StaticPool.applicationConfig.FIS_URL + "/"+ "createOrder";
+            string createOrderUrl = StaticPool.applicationConfig.FIS_URL + "/" + "createOrder";
 
             Dictionary<string, string> headerValues = new Dictionary<string, string>()
             {
@@ -188,7 +185,7 @@ namespace iPGSTools.Models
             };
             LogHelperv2.Logger_API_Infor("Send CreateOrder", LogHelperv2.SaveLogFolder, orderData);
 
-            var result = await ApiHelper.ApiHelpers.GeneralJsonAPI(createOrderUrl, orderData, headerValues, new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
+            var result = await ApiHelpers.GeneralJsonAPI(createOrderUrl, orderData, headerValues, new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
             if (result.IsSuccessful)
             {
                 try
@@ -208,7 +205,7 @@ namespace iPGSTools.Models
                 catch (Exception)
                 {
                     LogHelperv2.Logger_API_Error("CreateOrder Exception: " + result.Content, LogHelperv2.SaveLogFolder, orderData);
-                    return null ;
+                    return null;
                 }
             }
             LogHelperv2.Logger_API_Error("CreateOrder error: " + result.Content, LogHelperv2.SaveLogFolder, orderData);
@@ -220,15 +217,15 @@ namespace iPGSTools.Models
         {
             string paymentApiUrl = StaticPool.applicationConfig.FIS_URL + "/" + "payment";
 
-            LogHelperv2.Logger_API_Infor("Send payment"+ Newtonsoft.Json.JsonConvert.SerializeObject(paymentData), LogHelperv2.SaveLogFolder);
-            
+            LogHelperv2.Logger_API_Infor("Send payment" + Newtonsoft.Json.JsonConvert.SerializeObject(paymentData), LogHelperv2.SaveLogFolder);
+
             Dictionary<string, string> headerValues = new Dictionary<string, string>()
             {
                 {"Authorization", $"Bearer {token}"},
             };
 
 
-            var result = await ApiHelper.ApiHelpers.GeneralJsonAPI(paymentApiUrl, paymentData, headerValues, new Dictionary<string, string>(), 90000, RestSharp.Method.POST);
+            var result = await ApiHelpers.GeneralJsonAPI(paymentApiUrl, paymentData, headerValues, new Dictionary<string, string>(), 90000, RestSharp.Method.POST);
             if (result.IsSuccessful)
             {
                 try
@@ -240,7 +237,7 @@ namespace iPGSTools.Models
                     if (responseContent.message != "Success")
                     {
                         LogHelperv2.Logger_API_Error("payment error: " + result.Content, LogHelperv2.SaveLogFolder, paymentData);
-                        return null;   
+                        return null;
                     }
 
                     PaymentResponse paymentResponse = JsonConvert.DeserializeObject<PaymentResponse>(responseContent.data.ToString());
@@ -263,7 +260,7 @@ namespace iPGSTools.Models
         public static async Task<bool> AutoPaymentLog(Payment payment, PaymentResponse paymentResponse)
         {
             AgasLogAutopayment logAutoPayment = new AgasLogAutopayment();
-            if(paymentResponse != null)
+            if (paymentResponse != null)
             {
                 logAutoPayment.agastransid = payment.agastransid;
                 logAutoPayment.transidautopayment = payment.beaptransid;
@@ -284,7 +281,7 @@ namespace iPGSTools.Models
             }
 
             string petrolimexUrl = urlPetrolimex;
-            var result = await ApiHelper.ApiHelpers.GeneralJsonAPI(petrolimexUrl, logAutoPayment, new Dictionary<string, string>(), new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
+            var result = await ApiHelpers.GeneralJsonAPI(petrolimexUrl, logAutoPayment, new Dictionary<string, string>(), new Dictionary<string, string>(), 10000, RestSharp.Method.POST);
 
 
             if (result.IsSuccessful)
@@ -299,13 +296,13 @@ namespace iPGSTools.Models
             }
         }
         /// Dùng Using sẽ tự giải phóng client, nếu ko dùng using thì cần try catch finally để close client
-        public static async Task<bool> CreateInvoice(Payment payment, PaymentResponse paymentResponse)
+        public static async Task<bool> CreateInvoice(Payment payment, PaymentResponse paymentResponse, Vehicle vehicle)
         {
             LogHelperv2.Logger_LPR_Infor($"Bắt đầu gửi hóa đơn CreateInvoice với Host: {Host_InvoiceAgas}, Port: {Port_InvoiceAgas} ", LogHelperv2.SaveLogFolder);
 
             AgasCreateInvoice agasCreateInvoice = CreatInvoiceModel(payment, paymentResponse);
             string requestData = JsonConvert.SerializeObject(agasCreateInvoice);
-            
+
             TcpClient client = null;
             try
             {
@@ -314,7 +311,6 @@ namespace iPGSTools.Models
                     //client.Connect("14.232.215.179", 900);
                     var cancelTokenConnect = new CancellationTokenSource();
                     cancelTokenConnect.CancelAfter(TimeSpan.FromSeconds(10)); // Đặt thời gian timeout khi kết nối host 10 giây
-                    
 
                     await client.ConnectAsync(Host_InvoiceAgas, Port_InvoiceAgas).WaitAsync(cancelTokenConnect.Token);
 
@@ -327,15 +323,15 @@ namespace iPGSTools.Models
 
                             //string message = "{\r\n  \"apiname\": \"egas_createinvoice_feap\",\r\n  \"agasTransId\": 68009951716566301,\r\n  \"quantity\": 3.0,\r\n  \"price\": 23470.0,\r\n  \"amount\": 70410.0,\r\n  \"plateNumber\": \"29A-587.57\",\r\n  \"partnerCode\": \"VETC\",\r\n  \"BankCode\": \"VETC\"\r\n}\u0004";
                             string message = requestData + "\u0004";
-                            
+
                             byte[] data = Encoding.Unicode.GetBytes(message);
-                            
+
                             stream.Write(data.ToArray(), 0, data.Length);
-                            
+
                             byte[] buffer = new byte[2048];
 
                             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancelTokenRead.Token);
-                            
+
                             string response = Encoding.Unicode.GetString(buffer, 0, bytesRead);
 
                             string newResponse = response.Replace("\u0004", "").Trim();
@@ -346,25 +342,34 @@ namespace iPGSTools.Models
 
                             if (responseContent != null)
                             {
-                                if (responseContent.statuscode == "00")         // Thành công
+                                if (responseContent.statuscode == "00" || responseContent.statuscode == "01")
                                 {
-                                    LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice đến agas thành công received: " + responseContent, LogHelperv2.SaveLogFolder, agasCreateInvoice);
-                                    return true;
-                                }
-                                else if (responseContent.statuscode == "01")    // Thất bại
-                                {
-                                    LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice thành công -> nhận Statuscode = 01 với Error: " + responseContent, LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                                    if (responseContent.statuscode == "00")         // Thành công
+                                    {
+                                        LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice đến agas thành công nhận responseContent:", LogHelperv2.SaveLogFolder, responseContent);
+                                    }
+                                    else if (responseContent.statuscode == "01")    // Thất bại
+                                    {
+                                        LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice thành công -> nhận Statuscode = 01 với responseContent: ", LogHelperv2.SaveLogFolder, responseContent);
+                                    }
+                                    vehicle.createInvoiceResponse = responseContent;
                                     return true;
                                 }
                                 else
                                 {
-                                    LogHelperv2.Logger_LPR_Error("Gửi hóa đơn CreateInvoice đến agas thất bại Error: với status ngoại lệ" + responseContent, LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                                    LogHelperv2.Logger_LPR_Error("Gửi hóa đơn CreateInvoice đến agas nhận response thất bại: với status khác format -> responseContent: ", LogHelperv2.SaveLogFolder, responseContent);
+                                    vehicle.createInvoiceResponse = responseContent;
+                                    vehicle.createInvoiceResponse.reason = "Nhận kết quả hóa đơn null từ agas";
+                                    vehicle.createInvoiceResponse.statuscode = "02";
                                     return false;
                                 }
                             }
                             else
                             {
                                 LogHelperv2.Logger_LPR_Error("ResponseContent null !!!", LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                                vehicle.createInvoiceResponse = responseContent;
+                                vehicle.createInvoiceResponse.reason = "Api null";
+                                vehicle.createInvoiceResponse.statuscode = "02";
                                 return false;
                             }
                         }
@@ -372,6 +377,8 @@ namespace iPGSTools.Models
                     else
                     {
                         LogHelperv2.Logger_LPR_Error($"Client connected -> FAIL", LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                        vehicle.createInvoiceResponse = new AgasCreateInvoiceResponse();
+                        vehicle.createInvoiceResponse.reason = "Mất kết nối đường truyền tới Host agas";
                         return false;
                     }
                     return false;
@@ -390,8 +397,75 @@ namespace iPGSTools.Models
                 }
             }
         }
+        public static async Task<bool> CreateInvoice22(Payment payment, PaymentResponse paymentResponse, Vehicle vehicle)
+        {
+            LogHelperv2.Logger_LPR_Infor($"Bắt đầu gửi hóa đơn CreateInvoice với Host: {Host_InvoiceAgas}, Port: {Port_InvoiceAgas} ", LogHelperv2.SaveLogFolder);
 
-            private static AgasCreateInvoice CreatInvoiceModel(Payment payment, PaymentResponse paymentResponse)
+            AgasCreateInvoice agasCreateInvoice = CreatInvoiceModel(payment, paymentResponse);
+            string requestData = JsonConvert.SerializeObject(agasCreateInvoice);
+
+            TcpClient client = null;
+            try
+            {
+                using (client = new TcpClient())
+                {
+
+                    //string newResponse = "{\"apiname\":\"egas_createinvoice_feap\",\"agasTransId\":743429521721039693,\"responsedate\":\"15-11-2023 10:36:14\",\"statuscode\":\"00\",\"linkref\":\"http://hoadon.petrolimex.com.vn\",\"refcode\":\"WMBNAXX6B*\",\"reason\":\"\",\"checksum\":\"c51b085c7161429243065b62305a8337fea215a94cd7a3745937362970af8550\"}";
+                    //string newResponse = "{\"apiname\":\"egas_createinvoice_feap\",\"agasTransId\":743429521721030424,\"responsedate\":\"15-11-2023 08:02:13\",\"statuscode\":\"01\",\"linkref\":\"\",\"refcode\":\"\",\"reason\":\"Không lấy được/ không có dữ liệu viết hóa đơn/ hoặc log bơm không hợp lệ!\",\"checksum\":\"3734697ea4ba8c55d7d0d48f389d15391cfc420b2f5ff673127737467982b54d\"}";
+                    string newResponse = "{\"commandCode\":\"\",\"responseCode\":\"\",\"responseData\":null,\"checksum\":\"5dc9c71d5dbc3a4a7b24b17c7c25c9c22d0c14b6a7a2bff7f56aefab125aef03\"}";
+
+                    AgasCreateInvoiceResponse responseContent = JsonConvert.DeserializeObject<AgasCreateInvoiceResponse>(newResponse);
+
+                    if (responseContent != null)
+                    {
+                        if (responseContent.statuscode == "00" || responseContent.statuscode == "01")
+                        {
+                            if (responseContent.statuscode == "00")         // Thành công
+                            {
+                                LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice đến agas thành công nhận responseContent:", LogHelperv2.SaveLogFolder, responseContent);
+
+                            }
+                            else if (responseContent.statuscode == "01")    // Thất bại
+                            {
+                                LogHelperv2.Logger_LPR_Infor("Gửi hóa đơn CreateInvoice thành công -> nhận Statuscode = 01 với responseContent: ", LogHelperv2.SaveLogFolder, responseContent);
+                            }
+                            vehicle.createInvoiceResponse = responseContent;
+                            return true;
+                        }
+                        else
+                        {
+                            LogHelperv2.Logger_LPR_Error("Gửi hóa đơn CreateInvoice đến agas nhận response thất bại: với status khác format -> responseContent: ", LogHelperv2.SaveLogFolder, responseContent);
+                            vehicle.createInvoiceResponse = responseContent;
+                            vehicle.createInvoiceResponse.reason = "Nhận kết quả hóa đơn null từ agas";
+                            vehicle.createInvoiceResponse.statuscode = "02";
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        LogHelperv2.Logger_LPR_Error("ResponseContent null !!! -> request là:", LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                        vehicle.createInvoiceResponse = responseContent;
+                        vehicle.createInvoiceResponse.reason = "Api null";
+                        vehicle.createInvoiceResponse.statuscode = "02";
+                        return false;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelperv2.Logger_LPR_Error($"Exception CreateInvoice -> {ex}", LogHelperv2.SaveLogFolder, agasCreateInvoice);
+                return false;
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Close();
+                }
+            }
+        }
+        private static AgasCreateInvoice CreatInvoiceModel(Payment payment, PaymentResponse paymentResponse)
         {
             AgasCreateInvoice agasCreateInvoice = new AgasCreateInvoice();
             if (paymentResponse != null)

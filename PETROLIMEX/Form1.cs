@@ -1,6 +1,5 @@
 ﻿using CardDispenserLibrary;
 using Futech.LPR;
-using IPGS.Object.Databases;
 using Kztek.Cameras;
 using Kztek.LPR;
 using iPGSTools.Models;
@@ -12,10 +11,10 @@ using iPGSTools.Helper;
 using static iPGSTools.Models.Vehicle;
 using iPGSTools.Databases;
 using PETROLIMEX.Forms;
-using GeneralTool.NetworkTools;
-using iPGS.Tools;
 using PETROLIMEX;
 using System.Collections.Concurrent;
+using PETROLIMEX.Helper;
+using static iPGSTools.Helper.MLS;
 //using iPGS.Tools;
 
 namespace iPGSTools
@@ -36,7 +35,12 @@ namespace iPGSTools
 
         public static ConcurrentQueue<GasModel> gasModelQueue = new ConcurrentQueue<GasModel>();
         private bool IsEnableAutoOpenApp = true;
-
+        enum EmCamera
+        {
+            Tyandy,
+            Dahua,
+            Hanse
+        }
         #region Forms
         public Form1()
         {
@@ -45,11 +49,11 @@ namespace iPGSTools
                 InitializeComponent();
                 frm = this;
 
-                //Staticpool.vehicleWithAutoPayments.Add(new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = "38P105694" });
+                //StaticPool.vehicleWithAutoPayments.Add(new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = "38P105694" });
 
-                //foreach (Vehicle item in Staticpool.vehicleWithAutoPayments)
+                //foreach (Vehicle item in StaticPool.vehicleWithAutoPayments)
                 //{
-                //    dgvAutoPaymentVehicle.Rows.Add(dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, item.platenumber, item.GetDisplayStatus(), 0, 0);
+                //    dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, item.platenumber, item.GetDisplayStatus(), 0, 0, "", "", false);
                 //}
             }
             catch (Exception ex)
@@ -99,18 +103,38 @@ namespace iPGSTools
                 StaticPool.camera = new Kztek.Cameras.Camera()
                 {
                     ID = "1",
-                    Name = "Camera1",
+                    Name = "Camera",
                     VideoSource = StaticPool.applicationConfig.CameraIP,
                     HttpPort = 80,
                     ServerPort = 80,
                     Chanel = 1,
                     Login = StaticPool.applicationConfig.CameraUsername,
                     Password = StaticPool.applicationConfig.CameraPassword,
-                    CameraType = CameraTypes.GetType("Tiandy"),
+                    CameraType = CameraTypes.GetType("Dahua"),
+                    //CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString()),
+
                     StreamType = StreamTypes.GetType("H264"),
                     Resolution = "1280x720",
                     UsingPlugins = 0,
                 };
+                //Camera camera = new Camera();
+                //camera.ID = "1";
+                //camera.Name = "Camera";
+                //camera.VideoSource = StaticPool.applicationConfig.CameraIP;
+                //camera.HttpPort = 80;
+                //camera.ServerPort = 80;
+                //camera.Chanel = 1;
+                //camera.Login = StaticPool.applicationConfig.CameraUsername;
+                //camera.Password = StaticPool.applicationConfig.CameraPassword;
+                //camera.CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString());
+                //camera.StreamType = StreamTypes.GetType("H264");
+                //camera.Resolution = "1280x720";
+                //camera.UsingPlugins = 0;
+
+                //StaticPool.listCamera = new List<Camera>();
+                //StaticPool.listCamera.Add(StaticPool.camera);
+                //StaticPool.listCamera.Add(camera);
+
                 ucCameraView ucCam = new();
 
                 StartCameraView(ucCam);
@@ -131,7 +155,8 @@ namespace iPGSTools
                 }
                 InitDataGridView();
 
-                await Task.Delay(10000);
+                // Chờ load các thao tác trên hoàn thành
+                await Task.Delay(5000);
                 try
                 {
                     CreateHostBuilder().Build().RunAsync();
@@ -163,21 +188,12 @@ namespace iPGSTools
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception Form1_FormClosing ex: {ex}", LogHelperv2.SaveLogFolder);
             }
         }
-        private void Form1_FormClosing_1(object sender, FormClosingEventArgs e)
-        {
-            //controller.onEvent -= Controller_onEvent;
-            LogHelperv2.Logger_CONTROLLER_Error($"Đóng form Form1_FormClosing_1 với isEnableAutoApp = {IsEnableAutoOpenApp}", LogHelperv2.SaveLogFolder);
 
-            Task.Run(() =>
-            {
-                FISHelper.StopPollingAuthorize();
-            });
-        }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F5)
             {
-                button2.Visible = !button2.Visible;
+                btnTestDetect.Visible = !btnTestDetect.Visible;
             }
             else if (e.KeyCode == Keys.F6)
             {
@@ -428,7 +444,7 @@ namespace iPGSTools
         {
             try
             {
-                LogHelperv2.Logger_CONTROLLER_Infor("=>>>>>>>>>>>> Nhận sự kiện Agas", LogHelperv2.SaveLogFolder, gasModel);
+                LogHelperv2.Logger_CONTROLLER_Infor($"=>>>>>>>>>>>> Nhận sự kiện Agas, Sự kiện Agas chờ có số lượng: {gasModelQueue.Count}", LogHelperv2.SaveLogFolder, gasModel);
                 string IDAgas = Guid.NewGuid().ToString();      // IDAgas khác AgastransID
 
                 //Take Plate
@@ -538,7 +554,7 @@ namespace iPGSTools
                                     // Bơm xăng, sai quy trinh
                                     LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, Chưa có sự kiện nhấc cò", LogHelperv2.SaveLogFolder, vehicle);
                                     UpdateViewError(vehicle, MLS.BopCo.BomXangSaiQuyTrinh);
-                                    UpdateViewEtag(vehicle);
+                                    DeleteViewAndListEtag(vehicle);
                                     AddDGVEventError($"Biển số {plateNumber}", MLS.BopCo.BomXangSaiQuyTrinh);
 
                                     if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiQuyTrinh))
@@ -552,7 +568,7 @@ namespace iPGSTools
                                 // Nhận sự kiện tại vòi bơm khác nhưng bắt biển số tại vòi khác
                                 LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, sự kiện nhấc cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
                                 UpdateViewError(vehicle, MLS.BopCo.BomXangSaiVoi);
-                                UpdateViewEtag(vehicle);
+                                DeleteViewAndListEtag(vehicle);
                                 AddDGVEventError($"Biển số {plateNumber}", MLS.BopCo.BomXangSaiVoi);
 
                                 if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiVoi))
@@ -583,85 +599,88 @@ namespace iPGSTools
 
                                         //GỬI API YÊU CẦU THANH TOÁN SANG BEAP -- PAYMENT
                                         Payment payment = InitPayment(gasModel, vehicle);
-                                        //var paymentResponse = await FISHelper.Payment(payment);
 
-                                        //bool isPayment = false;
+                                        var paymentResponse = await FISHelper.Payment(payment);
 
-                                        //if (paymentResponse == null)
-                                        //{
-                                        //    // API Null
-                                        //    isPayment = false;
-                                        //    LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với etag paymentResponse = null, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
+                                        Task.Run(async () =>
+                                        {
+                                            bool isPayment = false;
+                                            if (paymentResponse == null)
+                                            {
+                                                // API Null
+                                                isPayment = false;
+                                                LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với etag paymentResponse = null, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
 
-                                        //    UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai);
-                                        //    UpdateViewEtag(vehicle);
-                                        //    StaticPool.vehicleWithAutoPayments.Remove(vehicle);
+                                                UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai);
+                                                DeleteViewAndListEtag(vehicle);
 
-                                        //    AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail);
-                                        //    // Thêm tblLog
-                                        //    MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.APIPaymentFail, IDAgas, "");
+                                                AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail);
+                                                // Thêm tblLog
+                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.APIPaymentFail, IDAgas, "");
+                                            }
+                                            else
+                                            {
+                                                //APi hợp lệ
+                                                //vehicle.VehicleStatus = !string.IsNullOrEmpty(paymentResponse.beaptransid) ? Vehicle.EmVehicleStatus.GacCo : Vehicle.EmVehicleStatus.HuyGiaoDich;
+                                                //Trả về thanh toán thành công
+                                                if (paymentResponse.paystatus.Contains("SUCC"))
+                                                {
+                                                    isPayment = true;
 
-                                        //    //ViewPaymentError(vehicle);
-                                        //    //return;
-                                        //}
-                                        //else
-                                        //{
-                                        //    // APi hợp lệ
-                                        //    //vehicle.VehicleStatus = !string.IsNullOrEmpty(paymentResponse.beaptransid) ? Vehicle.EmVehicleStatus.GacCo : Vehicle.EmVehicleStatus.HuyGiaoDich;
-                                        //    // Trả về thanh toán thành công
-                                        //    if (paymentResponse.paystatus.Contains("SUCC"))
-                                        //    {
-                                        //        isPayment = true;
-                                        //        LogHelperv2.Logger_CONTROLLER_Infor($"Thanh toán thành công với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+                                                    LogHelperv2.Logger_CONTROLLER_Infor($"Thanh toán thành công với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
 
-                                        //        UpdateView(vehicle, EmPaymentStatus.ThanhToanThanhCong);
-                                        //        UpdateViewEtag(vehicle);
-                                        //        StaticPool.vehicleWithAutoPayments.Remove(vehicle);
+                                                    StaticPool.vehicleWithAutoPayments.Remove(vehicle);
 
-                                        //        /// GỬI KẾT QUẢ THANH TOÁN THÀNH CÔNG ĐẾN AGAS - API LOG + API TẠO HÓA ĐƠN 
-                                        //        await Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse);
 
-                                        //    }
-                                        //    else  // Thanh toán thất bại
-                                        //    {
-                                        //        isPayment = false;
-                                        //        LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThanhCong);
+                                                    DeleteViewAndListEtag(vehicle);
 
-                                        //        // Lấy lý do thất bại
-                                        //        string reasonFail = paymentResponse.paystatus.Substring(4);
-                                        //        UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, reasonFail);
-                                        //        UpdateViewEtag(vehicle);
-                                        //        StaticPool.vehicleWithAutoPayments.Remove(vehicle);
-                                        //        //ViewPaymentError(vehicle);
-                                        //    }
+                                                    /// GỬI KẾT QUẢ THANH TOÁN THÀNH CÔNG ĐẾN AGAS - API LOG + API TẠO HÓA ĐƠN 
+                                                    await Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse);
 
-                                        //    // Nếu dữ liệu khác null thì Update dữ liệu vào db
-                                        //    if (!MyQuery.InsertPayment(vehicle, paymentResponse))
-                                        //    {
-                                        //        // Thong bao 
-                                        //        MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.InserttblPaymentFail, IDAgas, "");
 
-                                        //    }
-                                        //}
+                                                }
+                                                else if (paymentResponse.paystatus.Contains("FAIL"))  // Thanh toán thất bại
+                                                {
+                                                    isPayment = false;
+                                                    vehicle.Describtion = "Nhận thanh toán FAIL từ Backend";
+                                                    LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
 
-                                        //int statusPayment = isPayment ? (int)EmPaymentStatusSQL.ThanhToanThanhCong : (int)EmPaymentStatusSQL.ThanhToanThatBai;
-                                        //if (!MyQuery.UpdateMainEventPayment(vehicle, gasModel, statusPayment, true))
-                                        //{
-                                        //    // Thong bao
-                                        //    MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
+                                                    // Lấy lý do thất bại
+                                                    string reasonFail = paymentResponse.paystatus.Substring(4);
 
-                                        //}
+                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, reasonFail);
+                                                    DeleteViewAndListEtag(vehicle);
+                                                }
+                                                else
+                                                {
+                                                    vehicle.Describtion = "Nhận response ngoại lệ từ Backend";
+                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, vehicle.Describtion);
+                                                    DeleteViewAndListEtag(vehicle);
 
-                                        UpdateView(vehicle, EmPaymentStatus.ThanhToanThanhCong);
-                                        UpdateViewEtag(vehicle);
-                                        StaticPool.vehicleWithAutoPayments.Remove(vehicle);
+                                                    LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán trả về ngoại lệ: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+                                                }
+                                                // Lưu sự kiện bảng Payment 
+                                                if (!MyQuery.InsertPayment(vehicle, paymentResponse))
+                                                {
+                                                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.InserttblPaymentFail, IDAgas, "");
+                                                }
+                                            }
+                                            // Update bảng sự kiện chính MainEvent
+                                            int statusPayment = isPayment ? (int)EmPaymentStatusSQL.ThanhToanThanhCong : (int)EmPaymentStatusSQL.ThanhToanThatBai;
+                                            if (!MyQuery.UpdateMainEventPayment(vehicle, gasModel, statusPayment, true))
+                                            {
+                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
+
+                                            }
+                                        });
                                     }
                                     else
                                     {
                                         // Huy Đóng vòi, sai quy trình 
                                         LogHelperv2.Logger_CONTROLLER_Infor($"Đóng vòi, sai quy trình, Chưa có sự kiện bơm xăng", LogHelperv2.SaveLogFolder, vehicle);
                                         UpdateViewError(vehicle, MLS.GacCo.GacCoError);
-                                        UpdateViewEtag(vehicle);
+                                        DeleteViewAndListEtag(vehicle);
                                         AddDGVEventError($"Biển số {plateNumber}", MLS.GacCo.GacCoError);
 
                                         if (!vehicle.isNhacCo)
@@ -699,7 +718,7 @@ namespace iPGSTools
                                 vehicle.ImgPathCancel = ImgPath;
                                 LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
                                 UpdateView(vehicle, EmPaymentStatus.HuyGiaoDich);
-                                UpdateViewEtag(vehicle);
+                                DeleteViewAndListEtag(vehicle);
                                 if (!MyQuery.UpdateMainEventCancel(vehicle, gasModel))
                                 {
                                     MyQuery.InsertLog(EmTypeLog.LogError, "", IDAgas, "");
@@ -797,13 +816,15 @@ namespace iPGSTools
                 }
                 else
                 {
-                    if (!MyQuery.UpdateMainEventLogPayment(vehicle))
-                    {
-                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_LogPayment, IDAgas, "");
-                    }
+                    // Ko có bảng Log -> bỏ lưu ID log vào MainEvent
+                    //if (!MyQuery.UpdateMainEventLogPayment(vehicle))
+                    //{
+                    //    MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_LogPayment, IDAgas, "");
+                    //}
                 }
+
                 // gửi request tạo hóa đơn đến agas
-                if (!await FISHelper.CreateInvoice(payment, paymentResponse))
+                if (!await FISHelper.CreateInvoice(payment, paymentResponse, vehicle))
                 {
                     AddDGVEventError("feapcreateinvoice", MLS.GacCo.FeapCreateInvoice);
                 }
@@ -811,6 +832,14 @@ namespace iPGSTools
                 {
                     AddDGVEventError("FeapCreateInvoice", "Gửi hóa đơn CreateInvoice thành công");
                 }
+
+                UpdateViewHoaDon(vehicle);
+
+                LogHelperv2.Logger_LPR_Infor($"Kết thúc API TO AGAS reason: {vehicle.createInvoiceResponse.reason}", LogHelperv2.SaveLogFolder, vehicle);
+
+                // Lưu kết quả hóa đơn vào bảng hóa đơn tblCreateInvoice
+                MyQuery.InsertCreateInvoice(vehicle);
+
             }
             catch (Exception ex)
             {
@@ -829,9 +858,9 @@ namespace iPGSTools
                     {
                         dgvAutoPaymentVehicle.Rows.RemoveAt(0);
                     }
-                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", false);
+                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", "", false);
 
-                    dgvAutoPaymentVehicle.CurrentCell = dgvAutoPaymentVehicle.Rows[rowIndex].Cells[0];
+                    dgvAutoPaymentVehicle.CurrentCell = dgvAutoPaymentVehicle.Rows[rowIndex].Cells[1];
 
                     for (int i = 0; i < dgvAutoPaymentVehicle.Rows.Count; i++)
                     {
@@ -922,17 +951,17 @@ namespace iPGSTools
             }));
         }
 
-        private static void UpdateViewEtag(Vehicle vehicle)
+        public static void DeleteViewAndListEtag(Vehicle vehicle)
         {
             frm.dgvEtag.Invoke(new Action(() =>
             {
                 foreach (DataGridViewRow row in frm.dgvEtag.Rows)
                 {
-                    if (StaticPool.StandardlizePlateNumber(row.Cells["Etag"].Value.ToString()) ==
-                        StaticPool.StandardlizePlateNumber(vehicle.etag))
+                    if (row.Cells["Etag"].Value.ToString() == vehicle.etag)
                     {
                         frm.dgvEtag.Rows.Remove(row);
                         StaticPool.vehicleWithAutoPayments.Remove(vehicle);
+                        LogHelperv2.Logger_CONTROLLER_Infor($"Xóa thành công etag này trong list danh sách chờ bảng DGVEtag", LogHelperv2.SaveLogFolder, vehicle);
                         return;
                         // return có update view được ko
                     }
@@ -990,8 +1019,16 @@ namespace iPGSTools
 
                 plateNumber = StaticPool.StandardlizePlateNumber(plateNumber);
 
-                // Fix cung BS
-                plateNumber = "30H35392";
+                 //Fix cung BS
+                //if (gasModel.agastransid == "170515757628251057")
+                //{
+                //    plateNumber = "30H35392";
+
+                //}
+                //else
+                //{
+                //    plateNumber = "30A12716";
+                //}
 
                 if (string.IsNullOrEmpty(plateNumber) || plateNumber == "")
                 {
@@ -1046,42 +1083,6 @@ namespace iPGSTools
             order.feaprequestid = vehicle.feapresponseid;
             return order;
         }
-
-        private static void ViewPaymentError(Vehicle vehicle)
-        {
-            frm.dgvAutoPaymentVehicle.Invoke(new Action(() =>
-            {
-                foreach (DataGridViewRow row in frm.dgvAutoPaymentVehicle.Rows)
-                {
-                    if (StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString()) ==
-                        StaticPool.StandardlizePlateNumber(vehicle.platenumber))
-                    {
-                        //frm.dgvAutoPaymentVehicle.Rows.Remove(row);
-                        //row.Cells["dgvAutoPayment_status"].Value = vehicle.GetDisplayStatus();
-                        //row.Cells["dgvAutoPayment_volume"].Value = vehicle.Volume.ToString();
-                        //row.Cells["dgvAutoPayment_amount"].Value = vehicle.Amount.ToString();
-                        row.Cells["Payment"].Value = "Thanh toán thất bại \r\n ";
-                        return;
-                    }
-                }
-            }));
-            frm.dgvEtag.Invoke(new Action(() =>
-            {
-                foreach (DataGridViewRow row in frm.dgvEtag.Rows)
-                {
-                    if (StaticPool.StandardlizePlateNumber(row.Cells["Etag"].Value.ToString()) ==
-                        StaticPool.StandardlizePlateNumber(vehicle.etag))
-                    {
-                        frm.dgvEtag.Rows.Remove(row);
-                        StaticPool.vehicleWithAutoPayments.Remove(vehicle);
-                        return;
-                        // return có update view được ko
-                    }
-                }
-            }));
-            StaticPool.vehicleWithAutoPayments.Remove(vehicle);
-        }
-
         private static async Task DetectPlate(DateTime saveTime)
         {
             try
@@ -1236,6 +1237,7 @@ namespace iPGSTools
         //__GAS EVENT
         public static void UpdateView(Vehicle vehicle, EmPaymentStatus paymentStatus = EmPaymentStatus.DangThanhToan, string reasonFail = "")
         {
+            // Update view chưa bao gồm kết quả hóa đơn
             frm.dgvAutoPaymentVehicle.Invoke(new Action(() =>
             {
                 foreach (DataGridViewRow row in frm.dgvAutoPaymentVehicle.Rows)
@@ -1253,7 +1255,31 @@ namespace iPGSTools
 
                         if (paymentStatus == EmPaymentStatus.ThanhToanThanhCong || paymentStatus == EmPaymentStatus.ThanhToanThatBai || paymentStatus == EmPaymentStatus.HuyGiaoDich)
                         {
+                            if (paymentStatus == EmPaymentStatus.ThanhToanThanhCong)
+                            {
+                                row.Cells["CreateInvoice"].Value = "Đang gửi hóa đơn...";
+                            }
                             row.Cells["isFinishPayment"].Value = true;
+                        }
+                    }
+                }
+            }));
+        }
+        public static void UpdateViewHoaDon(Vehicle vehicle)
+        {
+            frm.dgvAutoPaymentVehicle.Invoke(new Action(() =>
+            {
+                foreach (DataGridViewRow row in frm.dgvAutoPaymentVehicle.Rows)
+                {
+                    if (row.Cells["IDVehicle"].Value.ToString() == vehicle.IDVehicle)
+                    {
+                        if (vehicle.createInvoiceResponse.statuscode == "00")
+                        {
+                            row.Cells["CreateInvoice"].Value = "Thành công";
+                        }
+                        else
+                        {
+                            row.Cells["CreateInvoice"].Value = $"Thất bại - {vehicle.createInvoiceResponse.reason}";
                         }
                     }
                 }
@@ -1317,68 +1343,32 @@ namespace iPGSTools
         public event OnEvent onEvent;
         private async void button1_Click(object sender, EventArgs e)
         {
-            while (true)
+            //while (true)
+            //{
+            //    MT116Controller.MT116EventArgs eventArgs = new MT116Controller.MT116EventArgs();
+
+            //    // Gọi trực tiếp phương thức sự kiện Controller_onEvent
+            //    eventArgs.CardNumber = "3416214B880E700001941070";
+            //    Controller_onEvent(this, eventArgs);
+            //    await Task.Delay(500);
+            //}
+
+            frmFakeEtag frm = new frmFakeEtag();
+            frm.ShowDialog();
+
+            if (frm.DialogResult == DialogResult.OK)
             {
                 MT116Controller.MT116EventArgs eventArgs = new MT116Controller.MT116EventArgs();
 
                 // Gọi trực tiếp phương thức sự kiện Controller_onEvent
-                eventArgs.CardNumber = "3416214B880E700001941070";
+                //eventArgs.CardNumber = "3416214B880E700001941070";
+
+                eventArgs.CardNumber = frm.Etag;
                 Controller_onEvent(this, eventArgs);
-                await Task.Delay(3000);
             }
-
-
-            //string b = await FISHelper.Authorize();
-            //string cmd = "select * from tblEtagEvent";
-            //DataTable dt = Staticpool.Mdb.FillData(cmd);
-
         }
 
-        private async void button2_Click(object sender, EventArgs e)
-        {
-            //Payment payment = new Payment()
-            //{
-            //    agastransid = "T123",
-            //    timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
-            //    pumpid = "81817",
-            //    stationid = "A1",
-            //    price = 20000,
-            //    volume = 1,
-            //    amount = 20000,
-            //    etag = "3416214B880E700001941070",
-            //    platenumber = "30H35392",
-            //    plxid = "PLX001",
-            //    subid = "15",
-            //    beaptransid = "100109",
-            //    feaprequestid = "123562"
-            //};
-            //PaymentResponse res = new PaymentResponse()
-            //{
-            //    paystatus = "SUCC",
-            //    feapresponseid = "Futech",
-            //    partnercode = "VETC",
-            //    beaptransid = "100109",
-            //    paytype = "2",
-            //    bankcode = "VETC",
-            //    payhash = null
-            //};
-            //string gsa = Newtonsoft.Json.JsonConvert.SerializeObject(payment);
 
-            //await FISHelper.AutoPaymentLog(payment, res);
-            //if (dgvEtag.Rows.Count > 10)
-            //{
-            //    dgvEtag.Rows.RemoveAt(0);
-            //}
-            //int rowIndex = dgvEtag.Rows.Add(dgvEtag.Rows.Count + 1, DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), textBox1.Text, "17M8-6130");
-            //dgvEtag.CurrentCell = dgvEtag.Rows[rowIndex].Cells[0];
-
-            //for (int i = 0; i < dgvEtag.Rows.Count; i++)
-            //{
-            //    dgvEtag.Rows[i].Cells["STTetag"].Value = (i + 1).ToString();
-            //}
-            //dgvEtag.Refresh();
-
-        }
 
         private void dgvNotRegisted_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
@@ -1397,25 +1387,10 @@ namespace iPGSTools
             }
         }
 
-        private void ToolStripRegisted_Click(object sender, EventArgs e)
+        private void ToolStripBaoCao_Click(object sender, EventArgs e)
         {
             frmReportVehiceRegisted f = new frmReportVehiceRegisted();
             f.Show();
-        }
-
-        private void ToolStripBaoCao_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panelCamera_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void dgvNotRegisted_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1427,26 +1402,6 @@ namespace iPGSTools
             dgvNotRegisted.Rows.Clear();
 
         }
-
-        private void dgvNotRegisted_MouseClick(object sender, MouseEventArgs e)
-        {
-            //if (e.Button == MouseButtons.Right)
-            //{
-            //    contextMenuStrip1.Show(dgvNotRegisted, e.Location);
-            //}
-        }
-
-        private async void button2_Click_2(object sender, EventArgs e)
-        {
-            PictureBox pictureBox1 = new PictureBox();
-            await TestDetectPlate(DateTime.Now);
-            string abc = plateNumber;
-            LogHelperv2.Logger_CONTROLLER_Infor($"----------> Nhận test nhận diện plate: {plateNumber}, imgPath : {ImgPath}", LogHelperv2.SaveLogFolder);
-
-            frmTestPlate frm = new frmTestPlate(ImgPath, plateNumber);
-            frm.Show();
-        }
-
 
         private async void btnTestAPI_Click(object sender, EventArgs e)
         {
@@ -1465,7 +1420,7 @@ namespace iPGSTools
                 paymentResponse.bankcode = "VETC";
 
                 // Gửi Request tạo hóa đơn đến AGAS
-                if (!await FISHelper.CreateInvoice(payment, paymentResponse))
+                if (!await FISHelper.CreateInvoice(payment, paymentResponse, new Vehicle()))
                 {
                     AddDGVEventError("feapcreateinvoice", "test " + MLS.GacCo.FeapCreateInvoice);
                 }
@@ -1496,5 +1451,37 @@ namespace iPGSTools
 
             timer1.Enabled = true;
         }
+
+        private async void btnTestDetect_Click(object sender, EventArgs e)
+        {
+            PictureBox pictureBox1 = new PictureBox();
+            await TestDetectPlate(DateTime.Now);
+            string abc = plateNumber;
+            LogHelperv2.Logger_CONTROLLER_Infor($"----------> Nhận test nhận diện plate: {plateNumber}, imgPath : {ImgPath}", LogHelperv2.SaveLogFolder);
+
+            frmTestPlate frm = new frmTestPlate(ImgPath, plateNumber);
+            frm.Show();
+        }
+
+        private void timeClearList_Tick(object sender, EventArgs e)
+        {
+            Vehicle vehicle_remove = new Vehicle();
+            if (StaticPool.vehicleWithAutoPayments.GetVehicleIfOverTime(StaticPool.applicationConfig.TimeClearList, ref vehicle_remove))
+            {
+                DeleteViewAndListEtag(vehicle_remove);
+            }
+        }
+
+        //private void button2_Click(object sender, EventArgs e)
+        //{
+        //    Vehicle vehicle = new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = $"{textBox1.Text}", etag = $"{textBox1.Text}" };
+        //    string etag = textBox1.Text;
+        //    AddDGVEtag(etag, vehicle);
+
+        //    foreach (Vehicle item in StaticPool.vehicleWithAutoPayments)
+        //    {
+        //        dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, item.platenumber, item.GetDisplayStatus(), 0, 0, "", "", false);
+        //    }
+        //}
     }
 }

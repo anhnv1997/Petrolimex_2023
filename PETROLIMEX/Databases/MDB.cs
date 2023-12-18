@@ -1,12 +1,7 @@
-﻿using iPGS.Tools;
-using iPGSTools.Helper;
-using System;
-using System.Collections.Generic;
+﻿using PETROLIMEX.Helper;
 using System.Data;
 using System.Data.OleDb;
 using System.Data.SqlClient;
-using System.Text;
-using System.Threading;
 
 namespace IPGS.Object.Databases
 {
@@ -157,7 +152,7 @@ namespace IPGS.Object.Databases
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Logger_CONTROLLER_Error($"ExecuteCommand Exception + '{ex.ToString()}'", LogHelper.SaveLogFolder);
+                        LogHelperv2.Logger_CONTROLLER_Error($"ExecuteCommand Exception + '{ex.ToString()}'", LogHelperv2.SaveLogFolder);
                     }
                 }
                 else if (OpenMdb())
@@ -170,7 +165,7 @@ namespace IPGS.Object.Databases
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Logger_CONTROLLER_Error($"ExecuteCommand Exception + '{ex.ToString()}'", LogHelper.SaveLogFolder);
+                        LogHelperv2.Logger_CONTROLLER_Error($"ExecuteCommand Exception + '{ex.ToString()}'", LogHelperv2.SaveLogFolder);
                     }
                 }
 

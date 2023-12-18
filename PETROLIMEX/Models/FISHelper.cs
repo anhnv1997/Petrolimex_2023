@@ -15,6 +15,7 @@ namespace iPGSTools.Models
         private static string urlPetrolimex = StaticPool.applicationConfig.AGAS_URl;                //"http://192.168.1.100:2068/api/PaymentLog/AutoPaymentLog";
         private static string Host_InvoiceAgas = StaticPool.applicationConfig.Host_CreateInvoice;    //"192.168.1.100:8088"  -  14.232.215.179:900;
         private static int Port_InvoiceAgas = StaticPool.applicationConfig.Port_CreateInvoice;       // 900
+        private static string urlFIS = StaticPool.applicationConfig.FIS_URL;
 
         public static async void StartPollingAuthorize()
         {
@@ -52,8 +53,12 @@ namespace iPGSTools.Models
         {
             try
             {
+                //string url = $"{urlFIS}/login";
                 //string url = Properties.Settings.Default.fis_url + "/" + "queryEtag";
-                string url = "http://petrolimex-hub.petrolimex.com.vn:7073/petro/login";
+                
+                // Tạm thời fix cứng do url login và còn lại đang lệch nhau 
+                string url = "https://petrolimex-hub.petrolimex.com.vn:7073/petro/login";
+
 
                 AuthorizeModel author = new AuthorizeModel();
 

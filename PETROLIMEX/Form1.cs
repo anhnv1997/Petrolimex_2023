@@ -111,30 +111,11 @@ namespace iPGSTools
                     Login = StaticPool.applicationConfig.CameraUsername,
                     Password = StaticPool.applicationConfig.CameraPassword,
                     CameraType = CameraTypes.GetType("Dahua"),
-                    //CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString()),
-
                     StreamType = StreamTypes.GetType("H264"),
                     Resolution = "1280x720",
                     UsingPlugins = 0,
                 };
-                //Camera camera = new Camera();
-                //camera.ID = "1";
-                //camera.Name = "Camera";
-                //camera.VideoSource = StaticPool.applicationConfig.CameraIP;
-                //camera.HttpPort = 80;
-                //camera.ServerPort = 80;
-                //camera.Chanel = 1;
-                //camera.Login = StaticPool.applicationConfig.CameraUsername;
-                //camera.Password = StaticPool.applicationConfig.CameraPassword;
-                //camera.CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString());
-                //camera.StreamType = StreamTypes.GetType("H264");
-                //camera.Resolution = "1280x720";
-                //camera.UsingPlugins = 0;
-
-                //StaticPool.listCamera = new List<Camera>();
-                //StaticPool.listCamera.Add(StaticPool.camera);
-                //StaticPool.listCamera.Add(camera);
-
+                
                 ucCameraView ucCam = new();
 
                 StartCameraView(ucCam);
@@ -1019,7 +1000,7 @@ namespace iPGSTools
 
                 plateNumber = StaticPool.StandardlizePlateNumber(plateNumber);
 
-                 //Fix cung BS
+                //Fix cung BS
                 //if (gasModel.agastransid == "170515757628251057")
                 //{
                 //    plateNumber = "30H35392";

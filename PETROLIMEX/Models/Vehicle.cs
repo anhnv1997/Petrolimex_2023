@@ -77,6 +77,7 @@ namespace iPGSTools.Models
         public long Amount { get; set; }
         public string Describtion{ get; set; } = string.Empty;
         public AgasCreateInvoiceResponse createInvoiceResponse { get; set; } = new AgasCreateInvoiceResponse();
+        public string LocationName { get; set; } = "";
         public string GetDisplayStatus()
         {
             switch (this.VehicleStatus)

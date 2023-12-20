@@ -82,7 +82,7 @@ namespace iPGSTools.Models
 
                         LogHelperv2.Logger_API_Infor("Login thành công received: " + result.Content, LogHelperv2.SaveLogFolder, loginData);
 
-                        string token = responseContent.data.ToString();
+                        string token = responseContent.data?.ToString();
 
                         return token;
 

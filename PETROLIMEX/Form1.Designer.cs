@@ -34,7 +34,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -43,7 +42,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.panelCamera = new System.Windows.Forms.Panel();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.ToolStripHeThong = new System.Windows.Forms.ToolStripMenuItem();
             this.thoátToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,24 +57,11 @@
             this.btnTestAPI = new System.Windows.Forms.Button();
             this.lblConnectStatus = new System.Windows.Forms.Label();
             this.pnlTop = new System.Windows.Forms.Panel();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pnlHeaderImage = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
             this.tabEvent = new Siticone.Desktop.UI.WinForms.SiticoneTabControl();
             this.VehiclePayment2 = new System.Windows.Forms.TabPage();
             this.dgvAutoPaymentVehicle = new System.Windows.Forms.DataGridView();
-            this.IDVehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.STTPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DateTimePayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_status = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Payment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CreateInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.isFinishPayment = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Etag2 = new System.Windows.Forms.TabPage();
             this.dgvEtag = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
             this.STTEtag = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -99,13 +85,21 @@
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timeClearList = new System.Windows.Forms.Timer(this.components);
+            this.IDVehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.STTPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DateTimePayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Location = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_status = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Payment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CreateInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.isFinishPayment = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picEnableOpenApp)).BeginInit();
             this.pnlTop.SuspendLayout();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.pnlHeaderImage.SuspendLayout();
             this.tabEvent.SuspendLayout();
             this.VehiclePayment2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvAutoPaymentVehicle)).BeginInit();
@@ -118,16 +112,6 @@
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // panelCamera
-            // 
-            this.panelCamera.BackColor = System.Drawing.SystemColors.Control;
-            this.panelCamera.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelCamera.Location = new System.Drawing.Point(0, 24);
-            this.panelCamera.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.panelCamera.Name = "panelCamera";
-            this.panelCamera.Size = new System.Drawing.Size(722, 162);
-            this.panelCamera.TabIndex = 0;
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -135,7 +119,7 @@
             this.ToolStripBaoCao});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1178, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1176, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -182,7 +166,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(942, 0);
+            this.button1.Location = new System.Drawing.Point(940, 0);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(80, 22);
             this.button1.TabIndex = 0;
@@ -200,9 +184,9 @@
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.lblConnectStatus);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 457);
+            this.panel1.Location = new System.Drawing.Point(0, 596);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1178, 24);
+            this.panel1.Size = new System.Drawing.Size(1176, 24);
             this.panel1.TabIndex = 3;
             // 
             // picEnableOpenApp
@@ -219,7 +203,7 @@
             // btnTestDetect
             // 
             this.btnTestDetect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestDetect.Location = new System.Drawing.Point(1025, -1);
+            this.btnTestDetect.Location = new System.Drawing.Point(1023, -1);
             this.btnTestDetect.Name = "btnTestDetect";
             this.btnTestDetect.Size = new System.Drawing.Size(75, 23);
             this.btnTestDetect.TabIndex = 2;
@@ -232,7 +216,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1106, 4);
+            this.label1.Location = new System.Drawing.Point(1104, 4);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(72, 15);
             this.label1.TabIndex = 1;
@@ -242,7 +226,7 @@
             // btnTestAPI
             // 
             this.btnTestAPI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestAPI.Location = new System.Drawing.Point(856, 0);
+            this.btnTestAPI.Location = new System.Drawing.Point(854, 0);
             this.btnTestAPI.Name = "btnTestAPI";
             this.btnTestAPI.Size = new System.Drawing.Size(80, 22);
             this.btnTestAPI.TabIndex = 0;
@@ -263,64 +247,31 @@
             // 
             // pnlTop
             // 
-            this.pnlTop.Controls.Add(this.panelCamera);
+            this.pnlTop.Controls.Add(this.panel3);
             this.pnlTop.Controls.Add(this.splitter2);
-            this.pnlTop.Controls.Add(this.panel2);
             this.pnlTop.Controls.Add(this.menuStrip1);
             this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTop.Location = new System.Drawing.Point(0, 0);
             this.pnlTop.Name = "pnlTop";
-            this.pnlTop.Size = new System.Drawing.Size(1178, 186);
+            this.pnlTop.Size = new System.Drawing.Size(1176, 314);
             this.pnlTop.TabIndex = 5;
+            // 
+            // panel3
+            // 
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Location = new System.Drawing.Point(0, 24);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(1166, 290);
+            this.panel3.TabIndex = 4;
             // 
             // splitter2
             // 
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter2.Location = new System.Drawing.Point(722, 24);
+            this.splitter2.Location = new System.Drawing.Point(1166, 24);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(10, 162);
+            this.splitter2.Size = new System.Drawing.Size(10, 290);
             this.splitter2.TabIndex = 3;
             this.splitter2.TabStop = false;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Controls.Add(this.pnlHeaderImage);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(732, 24);
-            this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.panel2.Size = new System.Drawing.Size(446, 162);
-            this.panel2.TabIndex = 2;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(10, 20);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(436, 142);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // pnlHeaderImage
-            // 
-            this.pnlHeaderImage.Controls.Add(this.label2);
-            this.pnlHeaderImage.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeaderImage.Location = new System.Drawing.Point(10, 0);
-            this.pnlHeaderImage.Name = "pnlHeaderImage";
-            this.pnlHeaderImage.Size = new System.Drawing.Size(436, 20);
-            this.pnlHeaderImage.TabIndex = 2;
-            // 
-            // label2
-            // 
-            this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(0, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(436, 20);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Ảnh chụp";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tabEvent
             // 
@@ -331,10 +282,10 @@
             this.tabEvent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabEvent.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.tabEvent.ItemSize = new System.Drawing.Size(190, 40);
-            this.tabEvent.Location = new System.Drawing.Point(0, 191);
+            this.tabEvent.Location = new System.Drawing.Point(0, 319);
             this.tabEvent.Name = "tabEvent";
             this.tabEvent.SelectedIndex = 0;
-            this.tabEvent.Size = new System.Drawing.Size(1178, 266);
+            this.tabEvent.Size = new System.Drawing.Size(1176, 277);
             this.tabEvent.TabButtonHoverState.BorderColor = System.Drawing.Color.Empty;
             this.tabEvent.TabButtonHoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(52)))), ((int)(((byte)(70)))));
             this.tabEvent.TabButtonHoverState.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -361,7 +312,7 @@
             this.VehiclePayment2.Location = new System.Drawing.Point(4, 44);
             this.VehiclePayment2.Name = "VehiclePayment2";
             this.VehiclePayment2.Padding = new System.Windows.Forms.Padding(3);
-            this.VehiclePayment2.Size = new System.Drawing.Size(1170, 218);
+            this.VehiclePayment2.Size = new System.Drawing.Size(1168, 229);
             this.VehiclePayment2.TabIndex = 0;
             this.VehiclePayment2.Text = "Xe chờ thanh toán";
             this.VehiclePayment2.UseVisualStyleBackColor = true;
@@ -388,6 +339,7 @@
             this.IDVehicle,
             this.STTPayment,
             this.DateTimePayment,
+            this.Location,
             this.dgvAutoPayment_plate,
             this.dgvAutoPayment_status,
             this.dgvAutoPayment_volume,
@@ -421,86 +373,8 @@
             this.dgvAutoPaymentVehicle.RowHeadersWidth = 50;
             this.dgvAutoPaymentVehicle.RowTemplate.Height = 10;
             this.dgvAutoPaymentVehicle.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvAutoPaymentVehicle.Size = new System.Drawing.Size(1164, 212);
+            this.dgvAutoPaymentVehicle.Size = new System.Drawing.Size(1162, 223);
             this.dgvAutoPaymentVehicle.TabIndex = 0;
-            // 
-            // IDVehicle
-            // 
-            this.IDVehicle.DataPropertyName = "IDVehicle";
-            this.IDVehicle.HeaderText = "IDVehicle";
-            this.IDVehicle.Name = "IDVehicle";
-            this.IDVehicle.ReadOnly = true;
-            this.IDVehicle.Visible = false;
-            // 
-            // STTPayment
-            // 
-            this.STTPayment.HeaderText = "STT";
-            this.STTPayment.Name = "STTPayment";
-            this.STTPayment.ReadOnly = true;
-            this.STTPayment.Width = 50;
-            // 
-            // DateTimePayment
-            // 
-            this.DateTimePayment.HeaderText = "Giờ Vào";
-            this.DateTimePayment.Name = "DateTimePayment";
-            this.DateTimePayment.ReadOnly = true;
-            this.DateTimePayment.Width = 150;
-            // 
-            // dgvAutoPayment_plate
-            // 
-            this.dgvAutoPayment_plate.HeaderText = "Biển số xe";
-            this.dgvAutoPayment_plate.Name = "dgvAutoPayment_plate";
-            this.dgvAutoPayment_plate.ReadOnly = true;
-            this.dgvAutoPayment_plate.Width = 150;
-            // 
-            // dgvAutoPayment_status
-            // 
-            this.dgvAutoPayment_status.HeaderText = "Trạng Thái";
-            this.dgvAutoPayment_status.Name = "dgvAutoPayment_status";
-            this.dgvAutoPayment_status.ReadOnly = true;
-            this.dgvAutoPayment_status.Width = 200;
-            // 
-            // dgvAutoPayment_volume
-            // 
-            this.dgvAutoPayment_volume.HeaderText = "Khối lượng (lít)";
-            this.dgvAutoPayment_volume.Name = "dgvAutoPayment_volume";
-            this.dgvAutoPayment_volume.ReadOnly = true;
-            this.dgvAutoPayment_volume.Width = 150;
-            // 
-            // dgvAutoPayment_amount
-            // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dgvAutoPayment_amount.DefaultCellStyle = dataGridViewCellStyle3;
-            this.dgvAutoPayment_amount.HeaderText = "Thành Tiền";
-            this.dgvAutoPayment_amount.Name = "dgvAutoPayment_amount";
-            this.dgvAutoPayment_amount.ReadOnly = true;
-            this.dgvAutoPayment_amount.Width = 150;
-            // 
-            // Payment
-            // 
-            this.Payment.HeaderText = "Thanh toán";
-            this.Payment.Name = "Payment";
-            this.Payment.ReadOnly = true;
-            this.Payment.Width = 162;
-            // 
-            // CreateInvoice
-            // 
-            this.CreateInvoice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.CreateInvoice.HeaderText = "Hóa Đơn";
-            this.CreateInvoice.Name = "CreateInvoice";
-            this.CreateInvoice.ReadOnly = true;
-            // 
-            // isFinishPayment
-            // 
-            this.isFinishPayment.FalseValue = "";
-            this.isFinishPayment.HeaderText = "Hoàn thành";
-            this.isFinishPayment.Name = "isFinishPayment";
-            this.isFinishPayment.ReadOnly = true;
-            this.isFinishPayment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.isFinishPayment.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.isFinishPayment.TrueValue = "";
-            this.isFinishPayment.Visible = false;
-            this.isFinishPayment.Width = 120;
             // 
             // Etag2
             // 
@@ -508,7 +382,7 @@
             this.Etag2.Location = new System.Drawing.Point(4, 44);
             this.Etag2.Name = "Etag2";
             this.Etag2.Padding = new System.Windows.Forms.Padding(3);
-            this.Etag2.Size = new System.Drawing.Size(1170, 218);
+            this.Etag2.Size = new System.Drawing.Size(1168, 229);
             this.Etag2.TabIndex = 1;
             this.Etag2.Text = "Xe đã đăng ký dịch vụ";
             this.Etag2.UseVisualStyleBackColor = true;
@@ -551,7 +425,7 @@
             this.dgvEtag.ReadOnly = true;
             this.dgvEtag.RowHeadersVisible = false;
             this.dgvEtag.RowTemplate.Height = 25;
-            this.dgvEtag.Size = new System.Drawing.Size(1164, 212);
+            this.dgvEtag.Size = new System.Drawing.Size(1162, 223);
             this.dgvEtag.TabIndex = 3;
             this.dgvEtag.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.dgvEtag.ThemeStyle.AlternatingRowsStyle.Font = null;
@@ -612,7 +486,7 @@
             this.VehicleN.Controls.Add(this.dgvNotRegisted);
             this.VehicleN.Location = new System.Drawing.Point(4, 44);
             this.VehicleN.Name = "VehicleN";
-            this.VehicleN.Size = new System.Drawing.Size(1170, 218);
+            this.VehicleN.Size = new System.Drawing.Size(1168, 229);
             this.VehicleN.TabIndex = 2;
             this.VehicleN.Text = "        Xe chưa đăng ký dịch vụ";
             this.VehicleN.UseVisualStyleBackColor = true;
@@ -651,7 +525,7 @@
             this.dgvNotRegisted.RowHeadersVisible = false;
             this.dgvNotRegisted.RowTemplate.Height = 25;
             this.dgvNotRegisted.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvNotRegisted.Size = new System.Drawing.Size(1170, 218);
+            this.dgvNotRegisted.Size = new System.Drawing.Size(1168, 229);
             this.dgvNotRegisted.TabIndex = 0;
             this.dgvNotRegisted.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgvNotRegisted_RowsAdded);
             // 
@@ -687,7 +561,7 @@
             this.EventError.Controls.Add(this.dgvEventError);
             this.EventError.Location = new System.Drawing.Point(4, 44);
             this.EventError.Name = "EventError";
-            this.EventError.Size = new System.Drawing.Size(1170, 218);
+            this.EventError.Size = new System.Drawing.Size(1168, 229);
             this.EventError.TabIndex = 3;
             this.EventError.Text = "Sự kiện lỗi";
             this.EventError.UseVisualStyleBackColor = true;
@@ -729,7 +603,7 @@
             this.dgvEventError.ReadOnly = true;
             this.dgvEventError.RowHeadersVisible = false;
             this.dgvEventError.RowTemplate.Height = 25;
-            this.dgvEventError.Size = new System.Drawing.Size(1170, 218);
+            this.dgvEventError.Size = new System.Drawing.Size(1168, 229);
             this.dgvEventError.TabIndex = 0;
             this.dgvEventError.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.dgvEventError.ThemeStyle.AlternatingRowsStyle.Font = null;
@@ -784,10 +658,10 @@
             // 
             this.splitter1.BackColor = System.Drawing.SystemColors.Control;
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(0, 186);
+            this.splitter1.Location = new System.Drawing.Point(0, 314);
             this.splitter1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(1178, 5);
+            this.splitter1.Size = new System.Drawing.Size(1176, 5);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
             // 
@@ -815,11 +689,95 @@
             this.timeClearList.Interval = 60000;
             this.timeClearList.Tick += new System.EventHandler(this.timeClearList_Tick);
             // 
+            // IDVehicle
+            // 
+            this.IDVehicle.DataPropertyName = "IDVehicle";
+            this.IDVehicle.HeaderText = "IDVehicle";
+            this.IDVehicle.Name = "IDVehicle";
+            this.IDVehicle.ReadOnly = true;
+            this.IDVehicle.Visible = false;
+            // 
+            // STTPayment
+            // 
+            this.STTPayment.HeaderText = "STT";
+            this.STTPayment.Name = "STTPayment";
+            this.STTPayment.ReadOnly = true;
+            this.STTPayment.Width = 50;
+            // 
+            // DateTimePayment
+            // 
+            this.DateTimePayment.HeaderText = "Giờ Vào";
+            this.DateTimePayment.Name = "DateTimePayment";
+            this.DateTimePayment.ReadOnly = true;
+            this.DateTimePayment.Width = 150;
+            // 
+            // Location
+            // 
+            this.Location.HeaderText = "Vị trí";
+            this.Location.Name = "Location";
+            this.Location.ReadOnly = true;
+            // 
+            // dgvAutoPayment_plate
+            // 
+            this.dgvAutoPayment_plate.HeaderText = "Biển số xe";
+            this.dgvAutoPayment_plate.Name = "dgvAutoPayment_plate";
+            this.dgvAutoPayment_plate.ReadOnly = true;
+            this.dgvAutoPayment_plate.Width = 150;
+            // 
+            // dgvAutoPayment_status
+            // 
+            this.dgvAutoPayment_status.HeaderText = "Trạng Thái";
+            this.dgvAutoPayment_status.Name = "dgvAutoPayment_status";
+            this.dgvAutoPayment_status.ReadOnly = true;
+            this.dgvAutoPayment_status.Width = 200;
+            // 
+            // dgvAutoPayment_volume
+            // 
+            this.dgvAutoPayment_volume.HeaderText = "Khối lượng (lít)";
+            this.dgvAutoPayment_volume.Name = "dgvAutoPayment_volume";
+            this.dgvAutoPayment_volume.ReadOnly = true;
+            this.dgvAutoPayment_volume.Width = 150;
+            // 
+            // dgvAutoPayment_amount
+            // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dgvAutoPayment_amount.DefaultCellStyle = dataGridViewCellStyle3;
+            this.dgvAutoPayment_amount.HeaderText = "Thành Tiền";
+            this.dgvAutoPayment_amount.Name = "dgvAutoPayment_amount";
+            this.dgvAutoPayment_amount.ReadOnly = true;
+            this.dgvAutoPayment_amount.Width = 150;
+            // 
+            // Payment
+            // 
+            this.Payment.HeaderText = "Thanh toán";
+            this.Payment.Name = "Payment";
+            this.Payment.ReadOnly = true;
+            this.Payment.Width = 162;
+            // 
+            // CreateInvoice
+            // 
+            this.CreateInvoice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.CreateInvoice.HeaderText = "Hóa Đơn";
+            this.CreateInvoice.Name = "CreateInvoice";
+            this.CreateInvoice.ReadOnly = true;
+            // 
+            // isFinishPayment
+            // 
+            this.isFinishPayment.FalseValue = "";
+            this.isFinishPayment.HeaderText = "Hoàn thành";
+            this.isFinishPayment.Name = "isFinishPayment";
+            this.isFinishPayment.ReadOnly = true;
+            this.isFinishPayment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.isFinishPayment.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.isFinishPayment.TrueValue = "";
+            this.isFinishPayment.Visible = false;
+            this.isFinishPayment.Width = 120;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1178, 481);
+            this.ClientSize = new System.Drawing.Size(1176, 620);
             this.Controls.Add(this.tabEvent);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.pnlTop);
@@ -844,9 +802,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.picEnableOpenApp)).EndInit();
             this.pnlTop.ResumeLayout(false);
             this.pnlTop.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.pnlHeaderImage.ResumeLayout(false);
             this.tabEvent.ResumeLayout(false);
             this.VehiclePayment2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvAutoPaymentVehicle)).EndInit();
@@ -862,8 +817,6 @@
         }
 
         #endregion
-
-        private Panel panelCamera;
         private Panel panel1;
         private Label lblConnectStatus;
         private Button button1;
@@ -886,8 +839,6 @@
         private DataGridViewTextBoxColumn NameEvent;
         private DataGridViewTextBoxColumn EventHD;
         private Splitter splitter1;
-        private Panel panel2;
-        private PictureBox pictureBox1;
         private Splitter splitter2;
         private ContextMenuStrip contextMenuStrip1;
         private ToolStripMenuItem clearToolStripMenuItem;
@@ -908,11 +859,11 @@
         private PictureBox picEnableOpenApp;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timeClearList;
-        private Panel pnlHeaderImage;
-        private Label label2;
+        private Panel panel3;
         private DataGridViewTextBoxColumn IDVehicle;
         private DataGridViewTextBoxColumn STTPayment;
         private DataGridViewTextBoxColumn DateTimePayment;
+        private DataGridViewTextBoxColumn Location;
         private DataGridViewTextBoxColumn dgvAutoPayment_plate;
         private DataGridViewTextBoxColumn dgvAutoPayment_status;
         private DataGridViewTextBoxColumn dgvAutoPayment_volume;

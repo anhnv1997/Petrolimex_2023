@@ -4,6 +4,7 @@ using Kztek.LPR;
 using iPGSTools.Models;
 using System.Text.RegularExpressions;
 using PetrolimexConfig.Model;
+using PETROLIMEX.Models;
 
 namespace PETROLIMEX
 {
@@ -18,6 +19,9 @@ namespace PETROLIMEX
         public static string SQLUserName = "";
         public static string SQLPassword = "";
         public static string SQLAuthentication = "";
+
+        public static List<LocationConfig> listLocationConfig = new List<LocationConfig>();
+        public static int NumberLocation = 0;
 
         public static ApplicationConfig applicationConfig;
         public static Camera camera;

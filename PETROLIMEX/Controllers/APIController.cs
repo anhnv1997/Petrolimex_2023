@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using iPGSTools.Models;
 using PETROLIMEX.Helper;
+using PETROLIMEX;
+using PETROLIMEX.Usercontrols;
+using System.Collections.Concurrent;
 
 namespace iPGSTools.Controllers
 {
@@ -31,9 +34,23 @@ namespace iPGSTools.Controllers
                     //LogHelper.Logger_SystemWarn($"Cảnh báo nhận Request với data null", Application.StartupPath);
                     return messageModel.MessageFail();
                 }
-                //UPDATE MAIN VIEW
-                Form1.gasModelQueue.Enqueue(data);
-                //Form1.UpdateGasEvent(data);
+                // Load config 
+
+                foreach (var location in StaticPool.listLocationConfig)
+                {
+                    foreach (var pumpID in location.listPumpID)
+                    {
+                        if(data.pumpid == pumpID.ToString())
+                        {
+                            string name = location.LocationName;
+                            if (Form1.locationQueueDictionary.ContainsKey(name))
+                            {
+                                ConcurrentQueue<GasModel> queue = Form1.locationQueueDictionary[name];
+                                queue.Enqueue(data);
+                            }
+                        }
+                    }
+                }
 
                 return messageModel.MessageSuccess();
             }

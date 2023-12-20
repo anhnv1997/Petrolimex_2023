@@ -15,7 +15,12 @@ using PETROLIMEX;
 using System.Collections.Concurrent;
 using PETROLIMEX.Helper;
 using static iPGSTools.Helper.MLS;
-//using iPGS.Tools;
+using PETROLIMEX.Usercontrols;
+using iPGS_ETOWN.UserControls;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using System.Runtime.CompilerServices;
+using PETROLIMEX.Models;
+using Timer = System.Windows.Forms.Timer;
 
 namespace iPGSTools
 {
@@ -31,17 +36,16 @@ namespace iPGSTools
         private static int takeImage = 0;
         private static string plateNumber = string.Empty;
         private static string ImgPath = string.Empty;
+        public static ucGridview<ucLocationView>? ucGridviewGates;
+        public static List<ucLocationView> listUcLocation = new List<ucLocationView>();
         #endregion
 
-        public static ConcurrentQueue<GasModel> gasModelQueue = new ConcurrentQueue<GasModel>();
+        // Fix cung queue
+        public static Dictionary<string, ConcurrentQueue<GasModel>> locationQueueDictionary = new Dictionary<string, ConcurrentQueue<GasModel>>();
+        public static Dictionary<string, Timer> locationTimerDictionary = new Dictionary<string, Timer>();
+        
         private bool IsEnableAutoOpenApp = true;
-        enum EmCamera
-        {
-            Tyandy,
-            Dahua,
-            Hanse,
-            Hello
-        }
+        // **************************** Đây là nhánh Multilane ************************************************
         #region Forms
         public Form1()
         {
@@ -50,12 +54,9 @@ namespace iPGSTools
                 InitializeComponent();
                 frm = this;
 
-                //StaticPool.vehicleWithAutoPayments.Add(new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = "38P105694" });
+                InitLocationView();
 
-                //foreach (Vehicle item in StaticPool.vehicleWithAutoPayments)
-                //{
-                //    dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, item.platenumber, item.GetDisplayStatus(), 0, 0, "", "", false);
-                //}
+
             }
             catch (Exception ex)
             {
@@ -64,23 +65,31 @@ namespace iPGSTools
 
         }
 
-        //public static bool CheckRangeOfNetwork(string txtIP)
-        //{
-        //    IEnumerable<string> ips = NetWorkTools.GetLocalIPAddress();
-        //    bool isFound = false;
-        //    foreach (string ipv4 in ips)
-        //    {
-        //        string[] splitIpv4 = ipv4.Split('.');
-        //        if (txtIP.IpBox1 == splitIpv4[0] && txtIP.IpBox2 == splitIpv4[1] && txtIP.IpBox3 == splitIpv4[2])
-        //        {
-        //            isFound = true;
-        //            break;
-        //        }
-        //        else continue;
-        //    }
+        private void InitLocationView()
+        {
+            int count = StaticPool.NumberLocation;
+            int width = panel3.Width / count;
+            ucGridviewGates = new ucGridview<ucLocationView>(1000, 5, 5);
 
-        //    return isFound;
-        //}
+            foreach (var location in StaticPool.listLocationConfig)
+            {
+                ucLocationView uc = new ucLocationView(location);
+                ucGridviewGates.AddItem(uc);
+                listUcLocation.Add(uc);
+
+                string name = location.LocationName;
+                // Khởi tạo queue
+                ConcurrentQueue<GasModel> gasModelQueue = new ConcurrentQueue<GasModel>();
+                locationQueueDictionary.Add(name, gasModelQueue);
+
+                // Khởi tạo timer
+                InitializeTimer(name, gasModelQueue);
+            }
+            ucGridviewGates.Dock = DockStyle.Fill;
+            ucGridviewGates.BringToFront();
+
+            panel3.Controls.Add(ucGridviewGates);
+        }
 
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -98,54 +107,8 @@ namespace iPGSTools
                 {
                     splitter2.SplitPosition = PETROLIMEX.Properties.Settings.Default.SplitPosition2;
                 }
-                panelCamera.SizeChanged += panelCamera_SizeChanged;
-                //StartAPIServer
-                //ConnectCamera
-                StaticPool.camera = new Kztek.Cameras.Camera()
-                {
-                    ID = "1",
-                    Name = "Camera",
-                    VideoSource = StaticPool.applicationConfig.CameraIP,
-                    HttpPort = 80,
-                    ServerPort = 80,
-                    Chanel = 1,
-                    Login = StaticPool.applicationConfig.CameraUsername,
-                    Password = StaticPool.applicationConfig.CameraPassword,
-                    //CameraType = CameraTypes.GetType("Dahua"),
-                    CameraType = CameraTypes.GetType(EmCamera.Dahua.ToString()),
-
-                    StreamType = StreamTypes.GetType("H264"),
-                    Resolution = "1280x720",
-                    UsingPlugins = 0,
-                };
-                Camera camera = new Camera();
-                camera.ID = "1";
-                camera.Name = "Camera";
-                camera.VideoSource = "192.168.20.98"; //StaticPool.applicationConfig.CameraIP;
-                camera.HttpPort = 80;
-                camera.ServerPort = 80;
-                camera.Chanel = 1;
-                camera.Login = "admin";//StaticPool.applicationConfig.CameraUsername;
-                camera.Password = "admin";//StaticPool.applicationConfig.CameraPassword;
-                camera.CameraType = CameraTypes.GetType(EmCamera.Hanse.ToString());
-                camera.StreamType = StreamTypes.GetType("H264");
-                camera.Resolution = "1280x720";
-                camera.UsingPlugins = 0;
-
-                StaticPool.listCamera = new List<Camera>();
-                StaticPool.listCamera.Add(StaticPool.camera);
-                StaticPool.listCamera.Add(camera);
-
-                ucCameraView ucCam = new();
-
-                StartCameraView(ucCam);
-                LogHelperv2.Logger_SystemInfor($"Load Camera thành công", LogHelperv2.SaveLogFolder);
-
+                //StartCameraView(ucCam);
                 CreateLPREngine();
-                Task.Run(() =>
-                {
-                    FISHelper.StartPollingAuthorize();
-                });
 
                 if (ConnectCardReader())
                 {
@@ -155,18 +118,7 @@ namespace iPGSTools
                     controller.PollingStart();
                 }
                 InitDataGridView();
-
-                // Chờ load các thao tác trên hoàn thành
-                await Task.Delay(5000);
-                try
-                {
-                    CreateHostBuilder().Build().RunAsync();
-                }
-                catch (Exception ex)
-                {
-                    LogHelperv2.Logger_CONTROLLER_Error($"Exception CreateHostBuilder ex = {ex}", LogHelperv2.SaveLogFolder);
-                    MessageBox.Show(ex.Message);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -275,34 +227,27 @@ namespace iPGSTools
         #endregion
 
         #region Private Function
-        private static IHostBuilder CreateHostBuilder() =>
-         Host.CreateDefaultBuilder()
-             .ConfigureWebHostDefaults(webBuilder =>
-             {
-                 webBuilder.UseUrls("http://*:" + StaticPool.applicationConfig.ApiPort);// 
-                 string a = StaticPool.applicationConfig.ApiPort.ToString();
-                 webBuilder.UseStartup<Startup>();
-             });
-        private void StartCameraView(ucCameraView ucCamera)
-        {
-            try
-            {
-                panelCamera?.Invoke(new Action(() =>
-                {
-                    panelCamera.Controls.Add(ucCamera);
-                    ucCamera?.Invoke(() =>
-                    {
-                        ucCamera.StartViewer(StaticPool.listCamera[1], CameraErrorFunc, CameraDoubleClickFunc);
-                    });
-                }));
-            }
-            catch (Exception ex)
-            {
-                LogHelperv2.Logger_CONTROLLER_Error($"Exception StartCameraView ex: {ex}", LogHelperv2.SaveLogFolder);
-                MessageBox.Show($"Exception StartCameraView: {ex}");
-            }
+       
+        //private void StartCameraView(ucCameraView ucCamera)
+        //{
+        //    try
+        //    {
+        //        panelCamera?.Invoke(new Action(() =>
+        //        {
+        //            panelCamera.Controls.Add(ucCamera);
+        //            ucCamera?.Invoke(() =>
+        //            {
+        //                ucCamera.StartViewer(StaticPool.listCamera[1], CameraErrorFunc, CameraDoubleClickFunc);
+        //            });
+        //        }));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogHelperv2.Logger_CONTROLLER_Error($"Exception StartCameraView ex: {ex}", LogHelperv2.SaveLogFolder);
+        //        MessageBox.Show($"Exception StartCameraView: {ex}");
+        //    }
 
-        }
+        //}
         private void CameraErrorFunc(object sender, string errorString)
         {
 
@@ -441,15 +386,30 @@ namespace iPGSTools
 
         public static object lockObj = new object();
         // SỰ KIỆN AGAS 
-        public static async Task UpdateGasEvent(GasModel gasModel)
+        public static async Task UpdateGasEvent(GasModel gasModel, string locationName)
         {
             try
             {
-                LogHelperv2.Logger_CONTROLLER_Infor($"=>>>>>>>>>>>> Nhận sự kiện Agas, Sự kiện Agas chờ có số lượng: {gasModelQueue.Count}", LogHelperv2.SaveLogFolder, gasModel);
+                // Ví dụ config
+                /* Vị trí 1 gán camera1 Tiandy và vòi 8,9,10 
+                   Vị trí 2 gán camera2 Hanse và vòi 5,6,7
+                   Vị trí 3 gán camera3 Dahua và vòi 2,3,4
+                 */
+
+                // Lấy ra ID vòi có sự kiện từ agas (VD: vòi 6)
+
+                // Tìm trong danh sách config StaticPool ứng với camera nào và vị trí nào (modelConfig {vòi 6; camera 2 ; vị trí 2})
+
+                // Gán StaticPool.Camera = camera 2 -> Dùng cho Detech camera (hiện tại StaticPool.camera dùng trong: - StartView load form
+                //                                                                                                    - Recoplate nhận dạng mỹ           
+                //                                                                                                    - Detech nhận dạng kztek
+                // Mỗi vị trí sử dụng 1 luồng - Các sự kiện vòi trong cùng 1 vị trí xử lý tuần tự
+
+                LogHelperv2.Logger_CONTROLLER_Infor($"=>>>>>>>>>>>> Nhận sự kiện Agas, Sự kiện Agas chờ có số lượng: {0}", LogHelperv2.SaveLogFolder, gasModel);
                 string IDAgas = Guid.NewGuid().ToString();      // IDAgas khác AgastransID
 
                 //Take Plate
-                await RecognPlate(gasModel);
+                await RecognPlate(gasModel, locationName);
 
                 // lưu sự kiện Agas vào db
                 if (!MyQuery.InsertQueryAgas(gasModel, IDAgas, ImgPath))
@@ -469,6 +429,7 @@ namespace iPGSTools
                     Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(plateNumber);
                     vehicle.IDAgas = IDAgas;
                     vehicle.TimeAgas = DateTime.Now;
+                    vehicle.LocationName = locationName;
 
                     switch (gasModel.pumpstatus)
                     {
@@ -859,7 +820,7 @@ namespace iPGSTools
                     {
                         dgvAutoPaymentVehicle.Rows.RemoveAt(0);
                     }
-                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", "", false);
+                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, "", vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", "", false);
 
                     dgvAutoPaymentVehicle.CurrentCell = dgvAutoPaymentVehicle.Rows[rowIndex].Cells[1];
 
@@ -970,7 +931,7 @@ namespace iPGSTools
             }));
         }
 
-        private static async Task RecognPlate(GasModel gasModel)
+        private static async Task RecognPlate(GasModel gasModel, string locationName)
         {
             try
             {
@@ -1015,21 +976,28 @@ namespace iPGSTools
                 }
                 else
                 {
-                    await DetectPlate(saveTime);
+                    await DetectPlate(saveTime, locationName);
+                }
+
+                foreach (var item in listUcLocation)
+                {
+                    if(item.title == locationName)
+                    {
+                        item.SetText(DateTime.Now, plateNumber);
+                    }
                 }
 
                 plateNumber = StaticPool.StandardlizePlateNumber(plateNumber);
 
-                 //Fix cung BS
-                //if (gasModel.agastransid == "170515757628251057")
-                //{
-                //    plateNumber = "30H35392";
-
-                //}
-                //else
-                //{
-                //    plateNumber = "30A12716";
-                //}
+                //Fix cung BS
+                if (gasModel.agastransid == "170515757628251057")
+                {
+                    plateNumber = "30H35392";
+                }
+                else
+                {
+                    plateNumber = "30A12716";
+                }
 
                 if (string.IsNullOrEmpty(plateNumber) || plateNumber == "")
                 {
@@ -1084,7 +1052,7 @@ namespace iPGSTools
             order.feaprequestid = vehicle.feapresponseid;
             return order;
         }
-        private static async Task DetectPlate(DateTime saveTime)
+        private static async Task DetectPlate(DateTime saveTime, string locationName)
         {
             try
             {
@@ -1092,7 +1060,16 @@ namespace iPGSTools
                 {
                     Directory.CreateDirectory(Application.StartupPath + "\\images");
                 }
-                Task task1 = Capture_Task(StaticPool.listCamera[1], Application.StartupPath + "\\images", saveTime);
+                Camera camera = new Camera();
+                foreach (var item in StaticPool.listLocationConfig)
+                {
+                    if(item.LocationName == locationName)
+                    {
+                        camera = item.Camera;
+                    }
+                }
+
+                Task task1 = Capture_Task(camera, Application.StartupPath + "\\images", saveTime, locationName);
                 await task1;
             }
             catch (Exception ex)
@@ -1116,7 +1093,7 @@ namespace iPGSTools
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception TestDetectPlate ex = {ex}", LogHelperv2.SaveLogFolder);
             }
         }
-        private static async Task Capture_Task(Camera camera, string imageFolder, DateTime eventTime)
+        private static async Task Capture_Task(Camera camera, string imageFolder, DateTime eventTime, string locationName)
         {
             try
             {
@@ -1129,10 +1106,17 @@ namespace iPGSTools
 
                     if (ImgPath != null && ImgPath != "")
                     {
-                        frm.Invoke(new Action(() =>
+                        //frm.Invoke(new Action(() =>
+                        //{
+
+                        foreach (var item in listUcLocation)
                         {
-                            frm.pictureBox1.Image = Image.FromFile(ImgPath);
-                        }));
+                            if(item.title == locationName)
+                            {
+                                item.SetImage(Image.FromFile(ImgPath));
+                            }
+                        }
+                        //}));
                     }
 
                     // Recognize
@@ -1151,7 +1135,7 @@ namespace iPGSTools
                     if (current_LPR_Index <= StaticPool.applicationConfig.CountDetect)
                     {
                         await Task.Delay(StaticPool.applicationConfig.TimeDelayDetect);
-                        await Capture_Task(camera, imageFolder, eventTime);
+                        await Capture_Task(camera, imageFolder, eventTime, locationName);
                     }
                     else
                     {
@@ -1194,7 +1178,7 @@ namespace iPGSTools
                     current_LPR_Index++;
                     if (current_LPR_Index <= StaticPool.applicationConfig.CountDetect)
                     {
-                        await Capture_Task(camera, imageFolder, eventTime);
+                        await Capture_Task(camera, imageFolder, eventTime, "");
                     }
                     else
                     {
@@ -1253,6 +1237,7 @@ namespace iPGSTools
                         row.Cells["dgvAutoPayment_volume"].Value = vehicle.Volume.ToString();
                         row.Cells["dgvAutoPayment_amount"].Value = vehicle.Amount.ToString("N0");
                         row.Cells["Payment"].Value = vehicle.GetPaymentStatus(paymentStatus) + $"{reasonFail}";
+                        row.Cells["Location"].Value = vehicle.LocationName;
 
                         if (paymentStatus == EmPaymentStatus.ThanhToanThanhCong || paymentStatus == EmPaymentStatus.ThanhToanThatBai || paymentStatus == EmPaymentStatus.HuyGiaoDich)
                         {
@@ -1300,6 +1285,7 @@ namespace iPGSTools
                         row.Cells["dgvAutoPayment_amount"].Value = vehicle.Amount.ToString();
                         row.Cells["Payment"].Value = textError;
                         row.Cells["isFinishPayment"].Value = true;
+                        row.Cells["Location"].Value = vehicle.LocationName;
                     }
                 }
             }));
@@ -1443,16 +1429,63 @@ namespace iPGSTools
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
-            timer1.Enabled = false;
+            //timer1.Enabled = false;
+
+            //if (gasModelQueue.TryDequeue(out GasModel gasModel))
+            //{
+            //    await UpdateGasEvent(gasModel);
+            //}
+
+            //timer1.Enabled = true;
+        }
+        private void InitializeTimer(string locationName, ConcurrentQueue<GasModel> gasModelQueue)
+        {
+            Timer timer = new Timer();
+            timer.Interval = 100;
+
+            // Gán sự kiện Tick cho timer
+            timer.Tick += (sender, e) => TimerTickHandler(sender, e, locationName, gasModelQueue);
+
+            timer.Start();
+
+            locationTimerDictionary.Add(locationName, timer);
+        }
+        
+        private async void TimerTickHandler(object sender, EventArgs e, string locationName, ConcurrentQueue<GasModel> gasModelQueue)
+        {
+            Timer timer = (Timer)sender;
+
+            timer.Enabled = false;
 
             if (gasModelQueue.TryDequeue(out GasModel gasModel))
             {
-                await UpdateGasEvent(gasModel);
+                await UpdateGasEvent(gasModel, locationName);
+                await Task.Delay(10000);
             }
 
-            timer1.Enabled = true;
+            timer.Enabled = true;
         }
+        //private void InitializeTimer(string locationName, ConcurrentQueue<GasModel> gasModelQueue)
+        //{
+        //    Timer timer = new Timer();
 
+        //    timer.Interval = 100;
+
+        //    // Thiết lập sự kiện tick cho timer
+        //    timer.Tick += async (sender, e) =>
+        //    {
+        //        timer.Enabled = false;
+        //        if (gasModelQueue.TryDequeue(out GasModel gasModel))
+        //        {
+        //            await UpdateGasEvent(gasModel, locationName);
+        //        }
+        //        timer.Enabled = true;
+        //    };
+
+        //    timer.Start();
+
+        //    locationTimerDictionary.Add(locationName, timer);
+        //}
         private async void btnTestDetect_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox1 = new PictureBox();

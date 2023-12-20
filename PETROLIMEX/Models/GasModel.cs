@@ -10,9 +10,9 @@
             HuyGiaoDich = 5,
         }
 
-        private int PumpStatus;
+        private int PumpStatus;     // Trạng thái đổ xăng (nhấc vòi, bơm xăng, gác vòi, hủy giao dịch)
 
-        private string TimeStamp; // Thời gian bắt đầu gửi tin
+        private string TimeStamp;   // Thời gian bắt đầu gửi tin
 
         private string Agastransid; // ID giao dịch AGAS
 
@@ -20,11 +20,11 @@
 
         private string Stationid;   // ID trạm xăng
 
-        private long Price;      // Đơn giá
+        private long Price;         // Đơn giá
 
-        private float Volume;     // khối lượng
+        private float Volume;       // khối lượng
 
-        private long Amount;     // Thành tiền
+        private long Amount;        // Thành tiền
 
         private string Reasonid;    // Lý do huỷ giao dịch 
 

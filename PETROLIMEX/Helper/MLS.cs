@@ -22,6 +22,7 @@
             public static string APICreateOrderNull = "Api CreateOrder null";
             public static string InserttblCreateOrderFail = "Thêm dữ liệu vào bảng tblCreateOrder thất bại";
             public static string InserttblMainEventFail = "Thêm dữ liệu vào bảng tblEventMain thất bại";
+            public static string WrongPump = "Cảnh báo đang có sự kiện bơm của biển số này";
         }
 
         public static class BopCo

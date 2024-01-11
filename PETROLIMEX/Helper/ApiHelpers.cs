@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using PetrolimexTools.Helper;
+using RestSharp;
 using RestSharp.Authenticators;
 
 namespace PETROLIMEX.Helper

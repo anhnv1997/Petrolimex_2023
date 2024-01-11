@@ -33,7 +33,7 @@
             // 
             // panelGridview
             // 
-            this.panelGridview.BackColor = System.Drawing.Color.RosyBrown;
+            this.panelGridview.BackColor = System.Drawing.SystemColors.Control;
             this.panelGridview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelGridview.Location = new System.Drawing.Point(0, 0);
             this.panelGridview.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);

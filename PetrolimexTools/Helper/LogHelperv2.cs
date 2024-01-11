@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace PETROLIMEX.Helper
+namespace PetrolimexTools.Helper
 {
     public class LogHelperv2
     {  //Multy Thread Excecute

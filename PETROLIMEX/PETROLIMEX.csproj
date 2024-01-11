@@ -27,7 +27,6 @@
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="Siticone.Desktop.UI" Version="2.1.1" />
     <PackageReference Include="SpreadsheetLight" Version="3.5.0" />
-    <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
@@ -35,11 +34,15 @@
   <ItemGroup>
     <ProjectReference Include="..\CardDispenserLibrary\CardDispenserLibrary\CardDispenserLibrary.csproj" />
     <ProjectReference Include="..\PetrolimexConfig\PetrolimexConfig.csproj" />
+    <ProjectReference Include="..\PetrolimexTools\PetrolimexTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="AForge">
       <HintPath>..\packages\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging">
+      <HintPath>Resource\AForge.Imaging.dll</HintPath>
     </Reference>
     <Reference Include="AForge.Video.DirectShowEx">
       <HintPath>..\packages\AForge.Video.DirectShowEx.dll</HintPath>

@@ -1,7 +1,7 @@
 ﻿
 using Kztek.Cameras;
 
-namespace PETROLIMEX.Models
+namespace PetrolimexTools.Model
 {
     public class LocationConfig
     {

@@ -3,24 +3,22 @@ using Futech.LPR;
 using Kztek.Cameras;
 using Kztek.LPR;
 using iPGSTools.Models;
-using iPGSTools.Usercontrols;
 using static iPGSTools.Models.GasModel;
 using static CardDispenserLibrary.MT116Controller;
-using static iPGSTools.Models.QueryEtagResponse;
 using iPGSTools.Helper;
-using static iPGSTools.Models.Vehicle;
 using iPGSTools.Databases;
 using PETROLIMEX.Forms;
-using PETROLIMEX;
 using System.Collections.Concurrent;
 using PETROLIMEX.Helper;
-using static iPGSTools.Helper.MLS;
 using PETROLIMEX.Usercontrols;
 using iPGS_ETOWN.UserControls;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using System.Runtime.CompilerServices;
-using PETROLIMEX.Models;
 using Timer = System.Windows.Forms.Timer;
+using static PetrolimexTools.Model.QueryEtagResponse;
+using PetrolimexTools.Helper;
+using static PetrolimexTools.Model.Vehicle;
+using PetrolimexTools;
+using PetrolimexTools.Model;
+using PETROLIMEX.Models;
 
 namespace iPGSTools
 {
@@ -33,17 +31,17 @@ namespace iPGSTools
         public static Configuration configs = new Configuration();
         private ICardDispenser controller;
         private static int current_LPR_Index = 0;
-        private static int takeImage = 0;
-        private static string plateNumber = string.Empty;
-        private static string ImgPath = string.Empty;
+
+        //public static string plateNumber = string.Empty;    // public
+        //public static string ImgPath = string.Empty;
+
         public static ucGridview<ucLocationView>? ucGridviewGates;
         public static List<ucLocationView> listUcLocation = new List<ucLocationView>();
         #endregion
 
-        // Fix cung queue
         public static Dictionary<string, ConcurrentQueue<GasModel>> locationQueueDictionary = new Dictionary<string, ConcurrentQueue<GasModel>>();
         public static Dictionary<string, Timer> locationTimerDictionary = new Dictionary<string, Timer>();
-        
+
         private bool IsEnableAutoOpenApp = true;
         // **************************** Đây là nhánh Multilane ************************************************
         #region Forms
@@ -54,6 +52,7 @@ namespace iPGSTools
                 InitializeComponent();
                 frm = this;
 
+                // Khơi tạo Location(camera..)
                 InitLocationView();
 
 
@@ -62,7 +61,6 @@ namespace iPGSTools
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception Form1 ex = {ex}", LogHelperv2.SaveLogFolder);
             }
-
         }
 
         private void InitLocationView()
@@ -118,7 +116,7 @@ namespace iPGSTools
                     controller.PollingStart();
                 }
                 InitDataGridView();
-                
+
             }
             catch (Exception ex)
             {
@@ -147,6 +145,17 @@ namespace iPGSTools
             if (e.KeyCode == Keys.F5)
             {
                 btnTestDetect.Visible = !btnTestDetect.Visible;
+                cbbDetechTest.Visible = !cbbDetechTest.Visible;
+
+                cbbDetechTest.Items.Clear();
+                if (cbbDetechTest.Visible == true)
+                {
+                    foreach (var item in StaticPool.listLocationConfig)
+                    {
+                        string name = item.LocationName;
+                        cbbDetechTest.Items.Add(name);
+                    }
+                }
             }
             else if (e.KeyCode == Keys.F6)
             {
@@ -155,6 +164,7 @@ namespace iPGSTools
             else if (e.KeyCode == Keys.F7)
             {
                 btnTestAPI.Visible = !btnTestAPI.Visible;
+
             }
             else if (e.Control && e.KeyCode == Keys.F4)
             {
@@ -182,15 +192,15 @@ namespace iPGSTools
         {
             try
             {
-                if (!NetWorkTools.IsPingSuccess(StaticPool.applicationConfig.ControllerIP, 100))
+                if (!NetWorkTools.IsPingSuccess(StaticPool.controllerInfo.controllerIP, 100))
                 {
                     MessageBox.Show("Không Thể Ping Đến Thiết Bị, Hãy Kiểm Tra Lại", "Thông Tin", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return false;
                 }
                 controller = ICardDispenserFactory.GetCardDispenser(EM_CardDispenser.v5);
-                controller.ControllerInfor.IpAddress = StaticPool.applicationConfig.ControllerIP;   // 1. 250
-                controller.ControllerInfor.Comport = StaticPool.applicationConfig.ControllerIP;
-                controller.ControllerInfor.Port = StaticPool.applicationConfig.ControllerPort;
+                controller.ControllerInfor.IpAddress = StaticPool.controllerInfo.controllerIP;   // 1. 250
+                controller.ControllerInfor.Comport = StaticPool.controllerInfo.controllerIP;
+                controller.ControllerInfor.Port = StaticPool.controllerInfo.controllerPort;
                 controller.ControllerInfor.Baudrate = 100;
                 if (controller.Connect())
                 {
@@ -227,7 +237,7 @@ namespace iPGSTools
         #endregion
 
         #region Private Function
-       
+
         //private void StartCameraView(ucCameraView ucCamera)
         //{
         //    try
@@ -330,7 +340,7 @@ namespace iPGSTools
                 string etag = e.CardNumber;
                 string feaprequestid = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
                 string etagid = "01";
-                string stationid = StaticPool.applicationConfig.StationID;
+                string stationid = StaticPool.StationID;
 
                 if (string.IsNullOrEmpty(stationid))
                 {
@@ -345,7 +355,7 @@ namespace iPGSTools
 
                 if (vehicle == null)
                 {
-                    AddDGVEventError("Etag: " + etag, MLS.Etag.APIQueryEtagFail);
+                    AddDGVEventError("Etag: " + etag, MLS.Etag.APIQueryEtagFail, "");
                     MyQuery.InsertLog(EmTypeLog.LogError, MLS.Etag.APIQueryEtagFail, "", etag);
                     return;
                 }
@@ -409,10 +419,11 @@ namespace iPGSTools
                 string IDAgas = Guid.NewGuid().ToString();      // IDAgas khác AgastransID
 
                 //Take Plate
-                await RecognPlate(gasModel, locationName);
+
+                modelDetech modelDetech = await RecognPlate(gasModel, locationName);
 
                 // lưu sự kiện Agas vào db
-                if (!MyQuery.InsertQueryAgas(gasModel, IDAgas, ImgPath))
+                if (!MyQuery.InsertQueryAgas(gasModel, IDAgas, modelDetech.ImagePath))
                 {
                     LogHelperv2.Logger_CONTROLLER_Infor("=>>>>>>>>>>>> Lưu vào db QueryAgas thất bại", LogHelperv2.SaveLogFolder, gasModel);
 
@@ -420,13 +431,23 @@ namespace iPGSTools
                     MyQuery.InsertLog(EmTypeLog.LogError, MLS.Agas.InserttblAgasFail, IDAgas, "");
                 }
 
-                //Kiểm tra danh sách xe tích hợp thanh toán tự động có xe đang đổ xăng hay không
-                if (StaticPool.vehicleWithAutoPayments.IsContainPlate(plateNumber))
+                if(gasModel.pumpstatus == (int)EM_PumpStatus.NhacCo)
                 {
-                    LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số thành công: {plateNumber} - Biển số có nằm trong danh sách chờ eTag", LogHelperv2.SaveLogFolder);
+                    // So sanh BS
+                }
+                else
+                {
+
+                }
+
+                //Kiểm tra danh sách xe tích hợp thanh toán tự động có xe đang đổ xăng hay không
+                if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                {
+                    LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số thành công: {modelDetech.PlateNumber} - Biển số có nằm trong danh sách chờ eTag", LogHelperv2.SaveLogFolder);
 
                     // Lấy phương tiện ứng vs BS
-                    Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(plateNumber);
+                    Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+                    // Vehicle.PlateNumber đã gán
                     vehicle.IDAgas = IDAgas;
                     vehicle.TimeAgas = DateTime.Now;
                     vehicle.LocationName = locationName;
@@ -435,13 +456,30 @@ namespace iPGSTools
                     {
                         case (int)EM_PumpStatus.NhacCo:
                             {
+                                if (vehicle.pumpid != "")
+                                {
+                                    if (vehicle.pumpid != gasModel.pumpid)
+                                    {
+                                        // Đang có sự kiện bơm cho biển số này ở vòi khác
+                                        // Hiện cảnh báo 
+                                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đang có sự kiện bơm cho bs: {modelDetech.PlateNumber} này với vòi bơm pumpID = {vehicle.pumpid} này!!!", LogHelperv2.SaveLogFolder, vehicle);
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đã có sự kiện nhấc cò cho bs: {modelDetech.PlateNumber}!!!", LogHelperv2.SaveLogFolder, vehicle);
+                                        return;
+                                    }
+                                }
                                 vehicle.VehicleStatus = Vehicle.EmVehicleStatus.NhacCo;
                                 vehicle.isNhacCo = true;
                                 vehicle.pumpid = gasModel.pumpid;
                                 vehicle.Price = gasModel.price;
                                 vehicle.Volume = 0;
                                 vehicle.Amount = 0;
-                                vehicle.ImgPathPickup = ImgPath;
+                                vehicle.ImgPathPickup = modelDetech.ImagePath;
 
                                 // Dữ liệu Order
                                 Order order = InitOrder(gasModel, vehicle);
@@ -476,7 +514,7 @@ namespace iPGSTools
                                     // Gửi API TẠO ĐƠN HÀNG thất bại null 
                                     MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.APICreateOrderFail, IDAgas, "");
 
-                                    AddDGVEventError("Create Order", MLS.NhacCo.APICreateOrderFail);
+                                    AddDGVEventError("Create Order", MLS.NhacCo.APICreateOrderFail, locationName);
 
                                     if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.NhacCo.APICreateOrderFail))
                                     {
@@ -492,7 +530,7 @@ namespace iPGSTools
                             vehicle.VehicleStatus = Vehicle.EmVehicleStatus.DangDoXang;
                             vehicle.Volume = gasModel.volume;
                             vehicle.Amount = gasModel.amount;
-                            vehicle.ImgPathPumping = ImgPath;
+                            vehicle.ImgPathPumping = modelDetech.ImagePath;
 
                             // Kiểm tra đã đúng vòi chưa 
                             if (vehicle.pumpid == gasModel.pumpid)
@@ -517,7 +555,7 @@ namespace iPGSTools
                                     LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, Chưa có sự kiện nhấc cò", LogHelperv2.SaveLogFolder, vehicle);
                                     UpdateViewError(vehicle, MLS.BopCo.BomXangSaiQuyTrinh);
                                     DeleteViewAndListEtag(vehicle);
-                                    AddDGVEventError($"Biển số {plateNumber}", MLS.BopCo.BomXangSaiQuyTrinh);
+                                    AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiQuyTrinh, locationName);
 
                                     if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiQuyTrinh))
                                     {
@@ -531,7 +569,7 @@ namespace iPGSTools
                                 LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, sự kiện nhấc cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
                                 UpdateViewError(vehicle, MLS.BopCo.BomXangSaiVoi);
                                 DeleteViewAndListEtag(vehicle);
-                                AddDGVEventError($"Biển số {plateNumber}", MLS.BopCo.BomXangSaiVoi);
+                                AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiVoi, locationName);
 
                                 if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiVoi))
                                 {
@@ -547,7 +585,7 @@ namespace iPGSTools
                                 vehicle.VehicleStatus = Vehicle.EmVehicleStatus.GacCo;
                                 vehicle.Amount = gasModel.amount;
                                 vehicle.Volume = gasModel.volume;
-                                vehicle.ImgPathPutdown = ImgPath;
+                                vehicle.ImgPathPutdown = modelDetech.ImagePath;
 
                                 if (vehicle.pumpid == gasModel.pumpid)
                                 {
@@ -573,10 +611,10 @@ namespace iPGSTools
                                                 isPayment = false;
                                                 LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với etag paymentResponse = null, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
 
-                                                UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai);
+                                                UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, "api null");
                                                 DeleteViewAndListEtag(vehicle);
 
-                                                AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail);
+                                                AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail, locationName);
                                                 // Thêm tblLog
                                                 MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.APIPaymentFail, IDAgas, "");
                                             }
@@ -598,7 +636,7 @@ namespace iPGSTools
                                                     DeleteViewAndListEtag(vehicle);
 
                                                     /// GỬI KẾT QUẢ THANH TOÁN THÀNH CÔNG ĐẾN AGAS - API LOG + API TẠO HÓA ĐƠN 
-                                                    await Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse);
+                                                    await Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse, locationName);
 
 
                                                 }
@@ -643,7 +681,7 @@ namespace iPGSTools
                                         LogHelperv2.Logger_CONTROLLER_Infor($"Đóng vòi, sai quy trình, Chưa có sự kiện bơm xăng", LogHelperv2.SaveLogFolder, vehicle);
                                         UpdateViewError(vehicle, MLS.GacCo.GacCoError);
                                         DeleteViewAndListEtag(vehicle);
-                                        AddDGVEventError($"Biển số {plateNumber}", MLS.GacCo.GacCoError);
+                                        AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.GacCo.GacCoError, locationName);
 
                                         if (!vehicle.isNhacCo)
                                         {
@@ -677,7 +715,7 @@ namespace iPGSTools
                             if (vehicle.pumpid == gasModel.pumpid)
                             {
                                 vehicle.VehicleStatus = Vehicle.EmVehicleStatus.HuyGiaoDich;
-                                vehicle.ImgPathCancel = ImgPath;
+                                vehicle.ImgPathCancel = modelDetech.ImagePath;
                                 LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
                                 UpdateView(vehicle, EmPaymentStatus.HuyGiaoDich);
                                 DeleteViewAndListEtag(vehicle);
@@ -707,7 +745,7 @@ namespace iPGSTools
                     LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số - Không tìm thấy biển số trong danh sách eTag (không dùng eTag hoặc eTag ko đăng ký giao dịch)", LogHelperv2.SaveLogFolder, gasModel);
                     Vehicle vehicleNotRegisted = new Vehicle();
 
-                    if (!MyQuery.CheckProcessError(plateNumber))
+                    if (!MyQuery.CheckProcessError(modelDetech.PlateNumber))
                     {
 
                     }
@@ -716,7 +754,7 @@ namespace iPGSTools
                     {
                         case (int)EM_PumpStatus.NhacCo:
                             // lưu db trạng thái nhấc cò
-                            if (!MyQuery.InsertMainEventNotRegisted(gasModel, plateNumber, IDAgas, ImgPath))
+                            if (!MyQuery.InsertMainEventNotRegisted(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
                             {
                                 //
                             }
@@ -724,21 +762,21 @@ namespace iPGSTools
 
                         case (int)EM_PumpStatus.BopCo:
                             // Tạm thời không check trạng thái đã nhấc cò chưa với xe chưa đăng ký
-                            if (!MyQuery.UpdateMainEventNotRegisted_BopCo(gasModel, plateNumber, IDAgas, ImgPath))
+                            if (!MyQuery.UpdateMainEventNotRegisted_BopCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
                             {
                                 //
                             }
 
                             break;
                         case (int)EM_PumpStatus.GacCo:
-                            if (!MyQuery.UpdateMainEventNotRegisted_GacCo(gasModel, plateNumber, IDAgas, ImgPath))
+                            if (!MyQuery.UpdateMainEventNotRegisted_GacCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
                             {
                                 //
                             }
                             break;
 
                         case (int)EM_PumpStatus.HuyGiaoDich:
-                            if (!MyQuery.UpdateMainEventNotRegisted_HuyGiaoDich(gasModel, plateNumber, IDAgas, ImgPath))
+                            if (!MyQuery.UpdateMainEventNotRegisted_HuyGiaoDich(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
                             {
                                 //
                             }
@@ -751,12 +789,14 @@ namespace iPGSTools
                     foreach (DataGridViewRow row in frm.dgvEventError.Rows)
                     {
                         string nameEvent = row.Cells["NameEvent"].Value?.ToString();
-                        if (nameEvent.Contains(plateNumber))
+                        string locationEr = row.Cells["locationError"].Value?.ToString();
+
+                        if (nameEvent.Contains(modelDetech.PlateNumber) && locationName == locationEr)
                         {
                             return;
                         }
                     }
-                    AddDGVEventError(plateNumber, MLS.Plate.ComparePlateFail);
+                    AddDGVEventError(modelDetech.PlateNumber, MLS.Plate.ComparePlateFail, locationName);
 
                 }
                 //Update view
@@ -767,14 +807,14 @@ namespace iPGSTools
             }
         }
 
-        private static async Task Send_API_Result_To_Agas(string IDAgas, Vehicle vehicle, Payment payment, PaymentResponse? paymentResponse)
+        private static async Task Send_API_Result_To_Agas(string IDAgas, Vehicle vehicle, Payment payment, PaymentResponse? paymentResponse, string locationName)
         {
             try
             {
                 // Gửi Log kết quả đến AGAS
                 if (!await FISHelper.AutoPaymentLog(payment, paymentResponse))
                 {
-                    AddDGVEventError("AutoPaymentLog", MLS.GacCo.APILogPaymentFail);
+                    AddDGVEventError("AutoPaymentLog", MLS.GacCo.APILogPaymentFail, locationName);
                 }
                 else
                 {
@@ -788,11 +828,11 @@ namespace iPGSTools
                 // gửi request tạo hóa đơn đến agas
                 if (!await FISHelper.CreateInvoice(payment, paymentResponse, vehicle))
                 {
-                    AddDGVEventError("feapcreateinvoice", MLS.GacCo.FeapCreateInvoice);
+                    AddDGVEventError("feapcreateinvoice", MLS.GacCo.FeapCreateInvoice, locationName);
                 }
                 else
                 {
-                    AddDGVEventError("FeapCreateInvoice", "Gửi hóa đơn CreateInvoice thành công");
+                    AddDGVEventError("FeapCreateInvoice", "Gửi hóa đơn CreateInvoice thành công", locationName);
                 }
 
                 UpdateViewHoaDon(vehicle);
@@ -816,7 +856,7 @@ namespace iPGSTools
             {
                 dgvAutoPaymentVehicle.Invoke(new Action(() =>
                 {
-                    if (dgvAutoPaymentVehicle.Rows.Count > 20)
+                    if (dgvAutoPaymentVehicle.Rows.Count > 30)
                     {
                         dgvAutoPaymentVehicle.Rows.RemoveAt(0);
                     }
@@ -893,7 +933,7 @@ namespace iPGSTools
             }
 
         }
-        private static void AddDGVEventError(string nameEventError, string statusError)
+        private static void AddDGVEventError(string nameEventError, string statusError, string locationName)
         {
             frm.dgvEventError?.Invoke(new Action(() =>
             {
@@ -902,7 +942,7 @@ namespace iPGSTools
                     frm.dgvEventError.Rows.RemoveAt(0);
                 }
 
-                int rowIndex = frm.dgvEventError.Rows.Add(frm.dgvEventError.Rows.Count + 1, DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), nameEventError, statusError);
+                int rowIndex = frm.dgvEventError.Rows.Add(frm.dgvEventError.Rows.Count + 1, DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), locationName, nameEventError, statusError);
                 frm.dgvEventError.CurrentCell = frm.dgvEventError.Rows[rowIndex].Cells[0];
 
                 for (int i = 0; i < frm.dgvEventError.Rows.Count; i++)
@@ -931,16 +971,19 @@ namespace iPGSTools
             }));
         }
 
-        private static async Task RecognPlate(GasModel gasModel, string locationName)
+        private static async Task<modelDetech> RecognPlate(GasModel gasModel, string locationName)
         {
             try
             {
-                plateNumber = "";
+                modelDetech model = new modelDetech();
+
+                //plateNumber = "";
 
                 DateTime saveTime = DateTime.Now;
 
                 if (!String.IsNullOrEmpty(StaticPool.applicationConfig.LPR_API))
                 {
+                    // Chưa xử lý cho location nào
                     Event_Info infor = await configs.Capture_Image(StaticPool.camera, Application.StartupPath + "\\images", saveTime);
 
                     if (!string.IsNullOrEmpty(infor?._imgPath_LPR_Morning))
@@ -955,62 +998,64 @@ namespace iPGSTools
                             {
                                 var results = GetBestResult(plateReaderResult);
                                 if (results != null && results.Count > 0)
-                                    plateNumber = results[results.Count - 1].Text;
+                                    model.PlateNumber = results[results.Count - 1].Text;
                                 else
-                                    plateNumber = string.Empty;
+                                    model.PlateNumber = string.Empty;
                             }
                             else
                             {
-                                plateNumber = string.Empty;
+                                model.PlateNumber = string.Empty;
                             }
                         }
                         else
                         {
-                            plateNumber = string.Empty;
+                            model.PlateNumber = string.Empty;
                         }
                     }
                     else
                     {
-                        plateNumber = string.Empty;
+                        model.PlateNumber = string.Empty;
                     }
                 }
                 else
                 {
-                    await DetectPlate(saveTime, locationName);
+                    model = await DetectPlate(saveTime, locationName);
                 }
 
                 foreach (var item in listUcLocation)
                 {
-                    if(item.title == locationName)
+                    if (item.title == locationName)
                     {
-                        item.SetText(DateTime.Now, plateNumber);
+                        item.SetText(DateTime.Now, model.PlateNumber);
                     }
                 }
 
-                plateNumber = StaticPool.StandardlizePlateNumber(plateNumber);
+                model.PlateNumber = StaticPool.StandardlizePlateNumber(model.PlateNumber);
 
                 //Fix cung BS
-                if (gasModel.agastransid == "170515757628251057")
-                {
-                    plateNumber = "30H35392";
-                }
-                else
-                {
-                    plateNumber = "30A12716";
-                }
+                //if (gasModel.agastransid == "170515757628251057")
+                //{
+                //    model.PlateNumber = "30H35392";
+                //}
+                //else
+                //{
+                //    model.PlateNumber = "30A12716";
+                //}
 
-                if (string.IsNullOrEmpty(plateNumber) || plateNumber == "")
+                if (string.IsNullOrEmpty(model.PlateNumber) || model.PlateNumber == "")
                 {
                     LogHelperv2.Logger_CONTROLLER_Error($"Đọc biển số thất bại với sự kiện agastranid sau: {gasModel.agastransid}", LogHelperv2.SaveLogFolder);
-                    AddDGVEventError("Plate Fail", MLS.Plate.ReadPlateFail);
+                    AddDGVEventError("Plate Fail", MLS.Plate.ReadPlateFail, locationName);
                     // Biển số rỗng vẫn lưu là sự kiện đổ xăng với xe không đăng ký -> ko return
                     //return;
                 }
-                LogHelperv2.Logger_CONTROLLER_Infor($"Đọc thành công biển số: {plateNumber} với sự kiện agastranid sau: {gasModel.agastransid}", LogHelperv2.SaveLogFolder);
+                LogHelperv2.Logger_CONTROLLER_Infor($"Đọc thành công biển số: {model.PlateNumber} với sự kiện agastranid sau: {gasModel.agastransid}", LogHelperv2.SaveLogFolder);
+                return model;
             }
             catch (Exception ex)
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception RecognPlate ex = {ex}", LogHelperv2.SaveLogFolder);
+                return new modelDetech();
             }
 
         }
@@ -1052,57 +1097,72 @@ namespace iPGSTools
             order.feaprequestid = vehicle.feapresponseid;
             return order;
         }
-        private static async Task DetectPlate(DateTime saveTime, string locationName)
+        private static async Task<modelDetech> DetectPlate(DateTime saveTime, string locationName)
         {
             try
             {
+                modelDetech model = new modelDetech();
                 if (!Directory.Exists(Application.StartupPath + "\\images"))
+                //if(!Directory.Exists(StaticPool.pathImage + "\\images" + $"\\{locationName}"))
                 {
                     Directory.CreateDirectory(Application.StartupPath + "\\images");
                 }
                 Camera camera = new Camera();
                 foreach (var item in StaticPool.listLocationConfig)
                 {
-                    if(item.LocationName == locationName)
+                    if (item.LocationName == locationName)
                     {
                         camera = item.Camera;
                     }
                 }
 
-                Task task1 = Capture_Task(camera, Application.StartupPath + "\\images", saveTime, locationName);
-                await task1;
+                model = await Capture_Task(camera, Application.StartupPath + "\\images", saveTime, locationName);
+                //await task1;
+                return model;
             }
             catch (Exception ex)
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception DetectPlate ex = {ex}", LogHelperv2.SaveLogFolder);
+                return new modelDetech();
             }
         }
-        private static async Task TestDetectPlate(DateTime saveTime)
+        public static async Task<modelDetech> TestDetectPlate(DateTime saveTime, string locationName)
         {
             try
             {
+                modelDetech model = new modelDetech();
                 if (!Directory.Exists(Application.StartupPath + "\\TestImages"))
                 {
                     Directory.CreateDirectory(Application.StartupPath + "\\TestImages");
                 }
-                Task task1 = TestCapture_Task(StaticPool.listCamera[1], Application.StartupPath + "\\TestImages", saveTime);
-                await task1;
+                Camera camera = new Camera();
+                foreach (var item in StaticPool.listLocationConfig)
+                {
+                    if (item.LocationName == locationName)
+                    {
+                        camera = item.Camera;
+                    }
+                }
+                model = await TestCapture_Task(camera, Application.StartupPath + "\\TestImages", saveTime);
+                return model;
             }
             catch (Exception ex)
             {
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception TestDetectPlate ex = {ex}", LogHelperv2.SaveLogFolder);
+                return new modelDetech();
             }
         }
-        private static async Task Capture_Task(Camera camera, string imageFolder, DateTime eventTime, string locationName)
+        private static async Task<modelDetech> Capture_Task(Camera camera, string imageFolder, DateTime eventTime, string locationName)
         {
             try
             {
+                modelDetech model = new modelDetech();
                 eventTime = DateTime.Now;   // Đặt lại thời gian để khi lưu ảnh ko bị trùng tên file ảnh (tên file ảnh là thời gian)
                 var event_Info = await configs.Capture_Image(camera, imageFolder, eventTime);
                 if (event_Info != null)
                 {
                     // Lưu đường dẫn ảnh 
-                    ImgPath = event_Info._imgPath_LPR_Morning;
+                    string ImgPath = event_Info._imgPath_LPR_Morning;
 
                     if (ImgPath != null && ImgPath != "")
                     {
@@ -1111,7 +1171,7 @@ namespace iPGSTools
 
                         foreach (var item in listUcLocation)
                         {
-                            if(item.title == locationName)
+                            if (item.title == locationName)
                             {
                                 item.SetImage(Image.FromFile(ImgPath));
                             }
@@ -1120,8 +1180,9 @@ namespace iPGSTools
                     }
 
                     // Recognize
-                    await ExcecuteLprDetect(event_Info, camera, imageFolder, eventTime);
-                    if (!string.IsNullOrEmpty(event_Info._plate_Number1)) return;
+                    model = await ExcecuteLprDetect(event_Info, camera, imageFolder, eventTime);
+                    model.ImagePath = ImgPath;
+                    if (!string.IsNullOrEmpty(event_Info._plate_Number1)) return model;
                     goto detectAgain;
                 }
                 else
@@ -1135,29 +1196,32 @@ namespace iPGSTools
                     if (current_LPR_Index <= StaticPool.applicationConfig.CountDetect)
                     {
                         await Task.Delay(StaticPool.applicationConfig.TimeDelayDetect);
-                        await Capture_Task(camera, imageFolder, eventTime, locationName);
+                        model = await Capture_Task(camera, imageFolder, eventTime, locationName);
                     }
                     else
                     {
                         current_LPR_Index = 0;
                     }
                 }
+                return model;
             }
             catch (Exception ex)
             {
                 LogHelperv2.Logger_API_Error($"Exception Capture_Task + {ex}", LogHelperv2.SaveLogFolder);
+                return new modelDetech();
             }
 
         }
-        private static async Task TestCapture_Task(Camera camera, string imageFolder, DateTime eventTime)
+        private static async Task<modelDetech> TestCapture_Task(Camera camera, string imageFolder, DateTime eventTime)
         {
             try
             {
+                modelDetech model = new modelDetech();
                 var event_Info = await configs.Capture_Image(camera, imageFolder, eventTime);
                 if (event_Info != null)
                 {
                     // Lưu đường dẫn ảnh 
-                    ImgPath = event_Info._imgPath_LPR_Morning;
+                    string ImgPath = event_Info._imgPath_LPR_Morning;
 
                     if (ImgPath != null && ImgPath != "")
                     {
@@ -1165,8 +1229,9 @@ namespace iPGSTools
                     }
 
                     // Recognize
-                    await ExcecuteLprDetect(event_Info, camera, imageFolder, eventTime);
-                    if (!string.IsNullOrEmpty(event_Info._plate_Number1)) return;
+                    model = await ExcecuteLprDetect(event_Info, camera, imageFolder, eventTime);
+                    model.ImagePath = ImgPath;
+                    if (!string.IsNullOrEmpty(event_Info._plate_Number1)) return model;
                     goto detectAgain;
                 }
                 else
@@ -1185,16 +1250,19 @@ namespace iPGSTools
                         current_LPR_Index = 0;
                     }
                 }
+                return model;
             }
             catch (Exception ex)
             {
 
                 LogHelperv2.Logger_API_Error($"Exception Capture_Task + {ex.ToString()}", LogHelperv2.SaveLogFolder);
+                return new modelDetech();
             }
 
         }
-        private static async Task ExcecuteLprDetect(Event_Info event_Info, Camera camera, string imageFolder, DateTime eventTime)
+        private static async Task<modelDetech> ExcecuteLprDetect(Event_Info event_Info, Camera camera, string imageFolder, DateTime eventTime)
         {
+            modelDetech model = new modelDetech();
             var task_1 = configs.Get_Car_PlateNumber(StaticPool.carANPR1, event_Info._imgPath_LPR_Morning);
             await task_1;
 
@@ -1209,14 +1277,19 @@ namespace iPGSTools
             {
                 event_Info.CameraIP = camera.VideoSource;
                 //Excecute Auto Plate Number Detect Event
-                ExcecutePlateNumDetectEvent(event_Info, camera);
+                model = ExcecutePlateNumDetectEvent(event_Info, camera);
                 current_LPR_Index = 0;
             }
+            return model;
         }
-        private static void ExcecutePlateNumDetectEvent(Event_Info event_Info, Camera camera)
+        private static modelDetech ExcecutePlateNumDetectEvent(Event_Info event_Info, Camera camera)
         {
-            if (event_Info._plate_Number1 == "" || event_Info._confidence1 < 0.1) return;
-            plateNumber = event_Info._plate_Number1;
+            if (event_Info._plate_Number1 == "" || event_Info._confidence1 < 0.1) return null;
+
+            modelDetech model = new modelDetech();
+            model.PlateNumber = event_Info._plate_Number1;
+            //plateNumber = event_Info._plate_Number1;
+            return model;
         }
 
         //__GAS EVENT
@@ -1230,7 +1303,7 @@ namespace iPGSTools
                     string a = StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString());
                     string b = StaticPool.StandardlizePlateNumber(vehicle.platenumber);
 
-                    if (StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString()) ==
+                    if (row.Cells["IDVehicle"].Value.ToString() == vehicle.IDVehicle && StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString()) ==
                         StaticPool.StandardlizePlateNumber(vehicle.platenumber) && (bool)row.Cells["isFinishPayment"].Value == false)
                     {
                         row.Cells["dgvAutoPayment_status"].Value = vehicle.GetDisplayStatus();
@@ -1277,7 +1350,7 @@ namespace iPGSTools
             {
                 foreach (DataGridViewRow row in frm.dgvAutoPaymentVehicle.Rows)
                 {
-                    if (StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString()) ==
+                    if (row.Cells["IDVehicle"].Value.ToString() == vehicle.IDVehicle && StaticPool.StandardlizePlateNumber(row.Cells["dgvAutoPayment_plate"].Value.ToString()) ==
                         StaticPool.StandardlizePlateNumber(vehicle.platenumber) && (bool)row.Cells["isFinishPayment"].Value == false)
                     {
                         row.Cells["dgvAutoPayment_status"].Value = vehicle.GetDisplayStatus();
@@ -1409,11 +1482,11 @@ namespace iPGSTools
                 // Gửi Request tạo hóa đơn đến AGAS
                 if (!await FISHelper.CreateInvoice(payment, paymentResponse, new Vehicle()))
                 {
-                    AddDGVEventError("feapcreateinvoice", "test " + MLS.GacCo.FeapCreateInvoice);
+                    AddDGVEventError("feapcreateinvoice", "test " + MLS.GacCo.FeapCreateInvoice, "Test");
                 }
                 else
                 {
-                    AddDGVEventError("feapcreateinvoice", "Test api CreateInvoice thành công");
+                    AddDGVEventError("feapcreateinvoice", "Test api CreateInvoice thành công", "Test");
                 }
             }
         }
@@ -1450,7 +1523,7 @@ namespace iPGSTools
 
             locationTimerDictionary.Add(locationName, timer);
         }
-        
+
         private async void TimerTickHandler(object sender, EventArgs e, string locationName, ConcurrentQueue<GasModel> gasModelQueue)
         {
             Timer timer = (Timer)sender;
@@ -1465,35 +1538,15 @@ namespace iPGSTools
 
             timer.Enabled = true;
         }
-        //private void InitializeTimer(string locationName, ConcurrentQueue<GasModel> gasModelQueue)
-        //{
-        //    Timer timer = new Timer();
 
-        //    timer.Interval = 100;
-
-        //    // Thiết lập sự kiện tick cho timer
-        //    timer.Tick += async (sender, e) =>
-        //    {
-        //        timer.Enabled = false;
-        //        if (gasModelQueue.TryDequeue(out GasModel gasModel))
-        //        {
-        //            await UpdateGasEvent(gasModel, locationName);
-        //        }
-        //        timer.Enabled = true;
-        //    };
-
-        //    timer.Start();
-
-        //    locationTimerDictionary.Add(locationName, timer);
-        //}
         private async void btnTestDetect_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox1 = new PictureBox();
-            await TestDetectPlate(DateTime.Now);
-            string abc = plateNumber;
-            LogHelperv2.Logger_CONTROLLER_Infor($"----------> Nhận test nhận diện plate: {plateNumber}, imgPath : {ImgPath}", LogHelperv2.SaveLogFolder);
+            modelDetech model = await TestDetectPlate(DateTime.Now, cbbDetechTest.Text);
+            string abc = model.PlateNumber;
+            LogHelperv2.Logger_CONTROLLER_Infor($"----------> Nhận test nhận diện plate: {model.PlateNumber}, imgPath : {model.ImagePath}", LogHelperv2.SaveLogFolder);
 
-            frmTestPlate frm = new frmTestPlate(ImgPath, plateNumber);
+            frmTestPlate frm = new frmTestPlate(model.ImagePath, model.PlateNumber);
             frm.Show();
         }
 

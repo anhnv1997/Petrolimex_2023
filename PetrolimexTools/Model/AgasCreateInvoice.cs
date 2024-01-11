@@ -1,4 +1,4 @@
-﻿namespace PETROLIMEX.Models
+﻿namespace PetrolimexTools.Model
 {
     public class AgasCreateInvoice
     {

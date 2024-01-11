@@ -1,7 +1,8 @@
 ﻿using System.Data;
 using System.Text;
 using iPGSTools.Helper;
-using PETROLIMEX.Helper;
+using PetrolimexTools;
+using PetrolimexTools.Helper;
 
 namespace PETROLIMEX.Forms
 {

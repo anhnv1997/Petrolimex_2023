@@ -1,7 +1,7 @@
-﻿using PETROLIMEX.Models;
-using static iPGSTools.Models.QueryEtagResponse;
+﻿
+using static PetrolimexTools.Model.QueryEtagResponse;
 
-namespace iPGSTools.Models
+namespace PetrolimexTools.Model
 {
     public class Vehicle
     {

@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
-using PETROLIMEX;
+using PetrolimexTools;
+using PetrolimexTools.Helper;
+using PetrolimexTools.Model;
 using PETROLIMEX.Helper;
-using PETROLIMEX.Models;
 using RestSharp;
 using System.Net.Sockets;
 using System.Text;
@@ -153,7 +154,7 @@ namespace iPGSTools.Models
                         vehicle.subid = response.subid;
                         vehicle.plxid = response.plxid;
                         vehicle.autopayment = response.autopayment;
-                        vehicle.feapresponseid = response.feapresponseid;
+                        vehicle.feapresponseid = response.feaprequestid;
 
                         return vehicle;
                     }

@@ -34,6 +34,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -42,7 +43,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.ToolStripHeThong = new System.Windows.Forms.ToolStripMenuItem();
             this.thoátToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,6 +51,7 @@
             this.ToolStripRegisted = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.cbbDetechTest = new System.Windows.Forms.ComboBox();
             this.picEnableOpenApp = new System.Windows.Forms.PictureBox();
             this.btnTestDetect = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -62,6 +63,17 @@
             this.tabEvent = new Siticone.Desktop.UI.WinForms.SiticoneTabControl();
             this.VehiclePayment2 = new System.Windows.Forms.TabPage();
             this.dgvAutoPaymentVehicle = new System.Windows.Forms.DataGridView();
+            this.IDVehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.STTPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DateTimePayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Location = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_status = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvAutoPayment_amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Payment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CreateInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.isFinishPayment = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Etag2 = new System.Windows.Forms.TabPage();
             this.dgvEtag = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
             this.STTEtag = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -76,26 +88,16 @@
             this.Plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EventError = new System.Windows.Forms.TabPage();
             this.dgvEventError = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
-            this.STTEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TimeEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.NameEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EventHD = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timeClearList = new System.Windows.Forms.Timer(this.components);
-            this.IDVehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.STTPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DateTimePayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Location = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_status = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_volume = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvAutoPayment_amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Payment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CreateInvoice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.isFinishPayment = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.STTEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TimeEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.locationError = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.NameEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EventHD = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picEnableOpenApp)).BeginInit();
@@ -166,7 +168,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(940, 0);
+            this.button1.Location = new System.Drawing.Point(806, 1);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(80, 22);
             this.button1.TabIndex = 0;
@@ -177,6 +179,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.cbbDetechTest);
             this.panel1.Controls.Add(this.picEnableOpenApp);
             this.panel1.Controls.Add(this.btnTestDetect);
             this.panel1.Controls.Add(this.label1);
@@ -188,6 +191,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1176, 24);
             this.panel1.TabIndex = 3;
+            // 
+            // cbbDetechTest
+            // 
+            this.cbbDetechTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbDetechTest.FormattingEnabled = true;
+            this.cbbDetechTest.Location = new System.Drawing.Point(970, 0);
+            this.cbbDetechTest.Name = "cbbDetechTest";
+            this.cbbDetechTest.Size = new System.Drawing.Size(121, 23);
+            this.cbbDetechTest.TabIndex = 4;
+            this.cbbDetechTest.Visible = false;
             // 
             // picEnableOpenApp
             // 
@@ -203,7 +216,7 @@
             // btnTestDetect
             // 
             this.btnTestDetect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestDetect.Location = new System.Drawing.Point(1023, -1);
+            this.btnTestDetect.Location = new System.Drawing.Point(889, 0);
             this.btnTestDetect.Name = "btnTestDetect";
             this.btnTestDetect.Size = new System.Drawing.Size(75, 23);
             this.btnTestDetect.TabIndex = 2;
@@ -226,7 +239,7 @@
             // btnTestAPI
             // 
             this.btnTestAPI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTestAPI.Location = new System.Drawing.Point(854, 0);
+            this.btnTestAPI.Location = new System.Drawing.Point(720, 1);
             this.btnTestAPI.Name = "btnTestAPI";
             this.btnTestAPI.Size = new System.Drawing.Size(80, 22);
             this.btnTestAPI.TabIndex = 0;
@@ -375,6 +388,90 @@
             this.dgvAutoPaymentVehicle.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvAutoPaymentVehicle.Size = new System.Drawing.Size(1162, 223);
             this.dgvAutoPaymentVehicle.TabIndex = 0;
+            // 
+            // IDVehicle
+            // 
+            this.IDVehicle.DataPropertyName = "IDVehicle";
+            this.IDVehicle.HeaderText = "IDVehicle";
+            this.IDVehicle.Name = "IDVehicle";
+            this.IDVehicle.ReadOnly = true;
+            this.IDVehicle.Visible = false;
+            // 
+            // STTPayment
+            // 
+            this.STTPayment.HeaderText = "STT";
+            this.STTPayment.Name = "STTPayment";
+            this.STTPayment.ReadOnly = true;
+            this.STTPayment.Width = 50;
+            // 
+            // DateTimePayment
+            // 
+            this.DateTimePayment.HeaderText = "Giờ Vào";
+            this.DateTimePayment.Name = "DateTimePayment";
+            this.DateTimePayment.ReadOnly = true;
+            this.DateTimePayment.Width = 150;
+            // 
+            // Location
+            // 
+            this.Location.HeaderText = "Vị trí";
+            this.Location.Name = "Location";
+            this.Location.ReadOnly = true;
+            // 
+            // dgvAutoPayment_plate
+            // 
+            this.dgvAutoPayment_plate.HeaderText = "Biển số xe";
+            this.dgvAutoPayment_plate.Name = "dgvAutoPayment_plate";
+            this.dgvAutoPayment_plate.ReadOnly = true;
+            this.dgvAutoPayment_plate.Width = 150;
+            // 
+            // dgvAutoPayment_status
+            // 
+            this.dgvAutoPayment_status.HeaderText = "Trạng Thái";
+            this.dgvAutoPayment_status.Name = "dgvAutoPayment_status";
+            this.dgvAutoPayment_status.ReadOnly = true;
+            this.dgvAutoPayment_status.Width = 200;
+            // 
+            // dgvAutoPayment_volume
+            // 
+            this.dgvAutoPayment_volume.HeaderText = "Khối lượng (lít)";
+            this.dgvAutoPayment_volume.Name = "dgvAutoPayment_volume";
+            this.dgvAutoPayment_volume.ReadOnly = true;
+            this.dgvAutoPayment_volume.Width = 150;
+            // 
+            // dgvAutoPayment_amount
+            // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dgvAutoPayment_amount.DefaultCellStyle = dataGridViewCellStyle3;
+            this.dgvAutoPayment_amount.HeaderText = "Thành Tiền";
+            this.dgvAutoPayment_amount.Name = "dgvAutoPayment_amount";
+            this.dgvAutoPayment_amount.ReadOnly = true;
+            this.dgvAutoPayment_amount.Width = 150;
+            // 
+            // Payment
+            // 
+            this.Payment.HeaderText = "Thanh toán";
+            this.Payment.Name = "Payment";
+            this.Payment.ReadOnly = true;
+            this.Payment.Width = 162;
+            // 
+            // CreateInvoice
+            // 
+            this.CreateInvoice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.CreateInvoice.HeaderText = "Hóa Đơn";
+            this.CreateInvoice.Name = "CreateInvoice";
+            this.CreateInvoice.ReadOnly = true;
+            // 
+            // isFinishPayment
+            // 
+            this.isFinishPayment.FalseValue = "";
+            this.isFinishPayment.HeaderText = "Hoàn thành";
+            this.isFinishPayment.Name = "isFinishPayment";
+            this.isFinishPayment.ReadOnly = true;
+            this.isFinishPayment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.isFinishPayment.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.isFinishPayment.TrueValue = "";
+            this.isFinishPayment.Visible = false;
+            this.isFinishPayment.Width = 120;
             // 
             // Etag2
             // 
@@ -586,6 +683,7 @@
             this.dgvEventError.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.STTEvent,
             this.TimeEvent,
+            this.locationError,
             this.NameEvent,
             this.EventHD});
             dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -627,33 +725,6 @@
             this.dgvEventError.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.dgvEventError.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             // 
-            // STTEvent
-            // 
-            this.STTEvent.HeaderText = "STT";
-            this.STTEvent.Name = "STTEvent";
-            this.STTEvent.ReadOnly = true;
-            // 
-            // TimeEvent
-            // 
-            this.TimeEvent.HeaderText = "Thời gian";
-            this.TimeEvent.Name = "TimeEvent";
-            this.TimeEvent.ReadOnly = true;
-            this.TimeEvent.Width = 265;
-            // 
-            // NameEvent
-            // 
-            this.NameEvent.HeaderText = "Tên sự kiện";
-            this.NameEvent.Name = "NameEvent";
-            this.NameEvent.ReadOnly = true;
-            this.NameEvent.Width = 264;
-            // 
-            // EventHD
-            // 
-            this.EventHD.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.EventHD.HeaderText = "Trạng thái lỗi";
-            this.EventHD.Name = "EventHD";
-            this.EventHD.ReadOnly = true;
-            // 
             // splitter1
             // 
             this.splitter1.BackColor = System.Drawing.SystemColors.Control;
@@ -689,89 +760,38 @@
             this.timeClearList.Interval = 60000;
             this.timeClearList.Tick += new System.EventHandler(this.timeClearList_Tick);
             // 
-            // IDVehicle
+            // STTEvent
             // 
-            this.IDVehicle.DataPropertyName = "IDVehicle";
-            this.IDVehicle.HeaderText = "IDVehicle";
-            this.IDVehicle.Name = "IDVehicle";
-            this.IDVehicle.ReadOnly = true;
-            this.IDVehicle.Visible = false;
+            this.STTEvent.HeaderText = "STT";
+            this.STTEvent.Name = "STTEvent";
+            this.STTEvent.ReadOnly = true;
             // 
-            // STTPayment
+            // TimeEvent
             // 
-            this.STTPayment.HeaderText = "STT";
-            this.STTPayment.Name = "STTPayment";
-            this.STTPayment.ReadOnly = true;
-            this.STTPayment.Width = 50;
+            this.TimeEvent.HeaderText = "Thời gian";
+            this.TimeEvent.Name = "TimeEvent";
+            this.TimeEvent.ReadOnly = true;
+            this.TimeEvent.Width = 265;
             // 
-            // DateTimePayment
+            // locationError
             // 
-            this.DateTimePayment.HeaderText = "Giờ Vào";
-            this.DateTimePayment.Name = "DateTimePayment";
-            this.DateTimePayment.ReadOnly = true;
-            this.DateTimePayment.Width = 150;
+            this.locationError.HeaderText = "Vị trí";
+            this.locationError.Name = "locationError";
+            this.locationError.ReadOnly = true;
             // 
-            // Location
+            // NameEvent
             // 
-            this.Location.HeaderText = "Vị trí";
-            this.Location.Name = "Location";
-            this.Location.ReadOnly = true;
+            this.NameEvent.HeaderText = "Tên sự kiện";
+            this.NameEvent.Name = "NameEvent";
+            this.NameEvent.ReadOnly = true;
+            this.NameEvent.Width = 264;
             // 
-            // dgvAutoPayment_plate
+            // EventHD
             // 
-            this.dgvAutoPayment_plate.HeaderText = "Biển số xe";
-            this.dgvAutoPayment_plate.Name = "dgvAutoPayment_plate";
-            this.dgvAutoPayment_plate.ReadOnly = true;
-            this.dgvAutoPayment_plate.Width = 150;
-            // 
-            // dgvAutoPayment_status
-            // 
-            this.dgvAutoPayment_status.HeaderText = "Trạng Thái";
-            this.dgvAutoPayment_status.Name = "dgvAutoPayment_status";
-            this.dgvAutoPayment_status.ReadOnly = true;
-            this.dgvAutoPayment_status.Width = 200;
-            // 
-            // dgvAutoPayment_volume
-            // 
-            this.dgvAutoPayment_volume.HeaderText = "Khối lượng (lít)";
-            this.dgvAutoPayment_volume.Name = "dgvAutoPayment_volume";
-            this.dgvAutoPayment_volume.ReadOnly = true;
-            this.dgvAutoPayment_volume.Width = 150;
-            // 
-            // dgvAutoPayment_amount
-            // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dgvAutoPayment_amount.DefaultCellStyle = dataGridViewCellStyle3;
-            this.dgvAutoPayment_amount.HeaderText = "Thành Tiền";
-            this.dgvAutoPayment_amount.Name = "dgvAutoPayment_amount";
-            this.dgvAutoPayment_amount.ReadOnly = true;
-            this.dgvAutoPayment_amount.Width = 150;
-            // 
-            // Payment
-            // 
-            this.Payment.HeaderText = "Thanh toán";
-            this.Payment.Name = "Payment";
-            this.Payment.ReadOnly = true;
-            this.Payment.Width = 162;
-            // 
-            // CreateInvoice
-            // 
-            this.CreateInvoice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.CreateInvoice.HeaderText = "Hóa Đơn";
-            this.CreateInvoice.Name = "CreateInvoice";
-            this.CreateInvoice.ReadOnly = true;
-            // 
-            // isFinishPayment
-            // 
-            this.isFinishPayment.FalseValue = "";
-            this.isFinishPayment.HeaderText = "Hoàn thành";
-            this.isFinishPayment.Name = "isFinishPayment";
-            this.isFinishPayment.ReadOnly = true;
-            this.isFinishPayment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.isFinishPayment.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.isFinishPayment.TrueValue = "";
-            this.isFinishPayment.Visible = false;
-            this.isFinishPayment.Width = 120;
+            this.EventHD.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.EventHD.HeaderText = "Trạng thái lỗi";
+            this.EventHD.Name = "EventHD";
+            this.EventHD.ReadOnly = true;
             // 
             // Form1
             // 
@@ -834,10 +854,6 @@
         private DataGridView dgvNotRegisted;
         private TabPage EventError;
         private Siticone.Desktop.UI.WinForms.SiticoneDataGridView dgvEventError;
-        private DataGridViewTextBoxColumn STTEvent;
-        private DataGridViewTextBoxColumn TimeEvent;
-        private DataGridViewTextBoxColumn NameEvent;
-        private DataGridViewTextBoxColumn EventHD;
         private Splitter splitter1;
         private Splitter splitter2;
         private ContextMenuStrip contextMenuStrip1;
@@ -871,5 +887,12 @@
         private DataGridViewTextBoxColumn Payment;
         private DataGridViewTextBoxColumn CreateInvoice;
         private DataGridViewCheckBoxColumn isFinishPayment;
+        private ComboBox cbbDetechTest;
+        private DataGridViewTextBoxColumn STTEvent;
+        private DataGridViewTextBoxColumn TimeEvent;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn NameEvent;
+        private DataGridViewTextBoxColumn EventHD;
+        private DataGridViewTextBoxColumn locationError;
     }
 }

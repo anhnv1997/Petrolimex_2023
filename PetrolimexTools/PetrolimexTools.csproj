@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Futech.LPR">
+      <HintPath>..\PETROLIMEX\Resource\Futech.LPR.dll</HintPath>
+    </Reference>
+    <Reference Include="Kztek.Cameras">
+      <HintPath>..\PETROLIMEX\Resource\Kztek.Cameras.dll</HintPath>
+    </Reference>
+    <Reference Include="Kztek.LPR">
+      <HintPath>..\PETROLIMEX\Resource\Kztek.LPR.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

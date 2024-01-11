@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardDispenserLibrary", "..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetrolimexConfig", "..\PetrolimexConfig\PetrolimexConfig.csproj", "{95439C2D-4D8E-4E7E-9F2A-B27EBF335F7B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetrolimexTools", "..\PetrolimexTools\PetrolimexTools.csproj", "{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{95439C2D-4D8E-4E7E-9F2A-B27EBF335F7B}.Release|x64.Build.0 = Release|Any CPU
 		{95439C2D-4D8E-4E7E-9F2A-B27EBF335F7B}.Release|x86.ActiveCfg = Release|Any CPU
 		{95439C2D-4D8E-4E7E-9F2A-B27EBF335F7B}.Release|x86.Build.0 = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|x64.Build.0 = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Debug|x86.Build.0 = Debug|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|x64.ActiveCfg = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|x64.Build.0 = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|x86.ActiveCfg = Release|Any CPU
+		{11AEFDF0-6B21-48C1-BA93-296870ED9D9B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

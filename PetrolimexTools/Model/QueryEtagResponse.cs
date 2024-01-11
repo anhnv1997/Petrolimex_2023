@@ -1,4 +1,4 @@
-﻿namespace iPGSTools.Models
+﻿namespace PetrolimexTools.Model
 {
     public class QueryEtagResponse
     {
@@ -14,5 +14,6 @@
         public string plxid { get; set; }
         public EmAutoPayment autopayment { get; set; } = EmAutoPayment.KhongThanhToanTuDong;
         public string feapresponseid { get; set; }
+        public string feaprequestid { get; set; }
     }
 }

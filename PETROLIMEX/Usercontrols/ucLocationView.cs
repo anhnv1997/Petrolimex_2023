@@ -1,19 +1,6 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using iPGSTools;
-using iPGSTools.Usercontrols;
-using Kztek.Cameras;
-using PETROLIMEX.Helper;
-using PETROLIMEX.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static HIKSDK.CHCNetSDK;
+﻿using Kztek.Cameras;
+using PetrolimexTools.Helper;
+using PetrolimexTools.Model;
 
 namespace PETROLIMEX.Usercontrols
 {
@@ -52,8 +39,9 @@ namespace PETROLIMEX.Usercontrols
         }
         public void SetText(DateTime dtime, string plate)
         {
-            lblTime.Text = dtime.ToString();
-            lblPlate.Text = plate;
+            lblTime.Text = "Time: " + dtime.ToString();
+            plate = plate == "" ? "Empty" : plate;
+            lblPlate.Text = "Biển số: " + plate;
         }
         private void StartCameraView(Camera cam)
         {

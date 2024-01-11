@@ -2,7 +2,7 @@
 using Kztek.LPR;
 using iPGSTools.Models;
 using System.Drawing.Imaging;
-using PETROLIMEX.Helper;
+using PetrolimexTools.Helper;
 
 namespace iPGSTools
 {

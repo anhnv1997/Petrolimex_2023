@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PetrolimexTools;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,16 +22,13 @@ namespace iPGSTools
         public frmTestPlate(string imgPath, string plate)
         {
             InitializeComponent();
-            
             this.ImgPath = imgPath;
             this.Plate = plate;
-            
-            
         }
 
         private void frmTestPlate_Load(object sender, EventArgs e)
         {
-            if(ImgPath != "")
+            if (ImgPath != "")
             {
                 pictureBox1.Image = Image.FromFile(ImgPath);
 
@@ -47,6 +45,10 @@ namespace iPGSTools
             {
                 label1.Text = "Ko tìm thấy plate";
             }
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
         }
     }
 }

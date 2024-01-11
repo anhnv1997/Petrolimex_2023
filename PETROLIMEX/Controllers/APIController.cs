@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using iPGSTools.Models;
-using PETROLIMEX.Helper;
-using PETROLIMEX;
-using PETROLIMEX.Usercontrols;
 using System.Collections.Concurrent;
+using PetrolimexTools.Helper;
+using PetrolimexTools;
 
 namespace iPGSTools.Controllers
 {

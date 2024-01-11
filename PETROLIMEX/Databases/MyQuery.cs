@@ -1,16 +1,13 @@
-﻿using CardDispenserLibrary;
-
+﻿
 //using iPGS.Tools;
 
-using iPGSTools.Helper;
 using iPGSTools.Models;
-using PETROLIMEX;
-using PETROLIMEX.Helper;
-using PETROLIMEX.Models;
+using PetrolimexTools;
+using PetrolimexTools.Helper;
+using PetrolimexTools.Model;
 using System.Data;
 using System.Text;
-using static iPGSTools.Helper.MLS;
-using static iPGSTools.Models.Vehicle;
+using static PetrolimexTools.Model.Vehicle;
 
 namespace iPGSTools.Databases
 {
@@ -154,7 +151,7 @@ namespace iPGSTools.Databases
 
 
                 vehicle.IDMainEvent = Guid.NewGuid().ToString();
-                string stationName = StaticPool.applicationConfig.StationName ?? "";
+                string stationName = StaticPool.StationName ?? "";
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append("insert into tblMainEvent (ID, CreateDate, TimeQueryEtag, QueryEtagID, TimeCreateOrder, CreateOrderID, ");
@@ -181,7 +178,7 @@ namespace iPGSTools.Databases
             try
             {
                 vehicle.IDMainEvent = Guid.NewGuid().ToString();
-                string stationName = StaticPool.applicationConfig.StationName ?? "";
+                string stationName = StaticPool.StationName ?? "";
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append("insert into tblMainEvent (ID, CreateDate, TimeQueryEtag, QueryEtagID, ");
@@ -207,7 +204,7 @@ namespace iPGSTools.Databases
         {
             try
             {
-                string stationName = StaticPool.applicationConfig.StationName ?? "";
+                string stationName = StaticPool.StationName ?? "";
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append("insert into tblMainEvent (ID, CreateDate, PlateNumber, IsPlateValid, StationID, ");

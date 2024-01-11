@@ -1,14 +1,12 @@
-﻿using IPGS.Object.Databases;
-using PETROLIMEX.Helper;
-using PetrolimexConfig.Model;
-using System.Net.Sockets;
-using System.Net;
+﻿using System.Net;
 using System.Data;
-using PETROLIMEX.Models;
 using Kztek.Cameras;
 using Newtonsoft.Json;
 using iPGSTools.Models;
 using iPGSTools;
+using PetrolimexTools.Helper;
+using PetrolimexTools;
+using PetrolimexTools.Model;
 
 namespace PETROLIMEX.Forms
 {
@@ -18,8 +16,8 @@ namespace PETROLIMEX.Forms
         {
             InitializeComponent();
 
-            StaticPool.SQLConfigPath = $"{Application.StartupPath}\\SQLConfig.xml";
-            StaticPool.SystemConfigPath = $"{Application.StartupPath}\\ApplicationConfig.xml";
+            //StaticPool.SQLConfigPath = $"{Application.StartupPath}\\SQLConfig.xml";
+            //StaticPool.SystemConfigPath = $"{Application.StartupPath}\\ApplicationConfig.xml";
 
         }
 
@@ -28,7 +26,9 @@ namespace PETROLIMEX.Forms
             try
             {
                 lblMessage.Text = "Đang tải cấu hình...";
-                LoadSQL();
+
+                StaticPool.LoadSQL();
+                //LoadSQL();
                 lblMessage.Text = "Load SQL hoàn tất";
 
                 LoadSystemConfig();
@@ -77,7 +77,7 @@ namespace PETROLIMEX.Forms
             string namePC = Environment.MachineName;
 
 
-            // Check tên máy tính
+            // Check tên máy tính*********************************************************************************************************************
             string cmd = $"Select * from tblPC where ComputerName = '{namePC}' or IPAdress = '{IPLocal}'";
             DataTable dtPC = StaticPool.mdb.FillData(cmd);
 
@@ -89,8 +89,33 @@ namespace PETROLIMEX.Forms
 
             string PCID = dtPC.Rows[0]["PCID"].ToString();
             string namepc = dtPC.Rows[0]["ComputerName"].ToString();
+            string pathImage = dtPC.Rows[0]["PicPath"].ToString();
+            StaticPool.pathImage = pathImage;
 
-            // Check location
+            // Check Station
+            string cmdStation = $"Select * from tblStation where PCID = '{PCID}'";
+            DataTable dtStation = StaticPool.mdb.FillData(cmdStation);
+
+            if (dtStation != null && dtStation.Rows.Count > 0)
+            {
+                StaticPool.StationName = dtStation.Rows[0]["StationName"].ToString();
+                StaticPool.StationID = dtStation.Rows[0]["AgasStationID"].ToString();
+            }
+
+            // Check BDK ***************************************************************************************************************************
+            string cmdBDK = $"Select PCID, Comport, Baudrate from tblController where PCID = '{PCID}'";
+            DataTable dtPC2 = StaticPool.mdb.FillData(cmdBDK);
+            if (dtPC2 != null && dtPC2.Rows.Count > 0)
+            {
+                StaticPool.controllerInfo.controllerIP = dtPC2.Rows[0]["Comport"].ToString();
+                StaticPool.controllerInfo.controllerPort = int.Parse(dtPC2.Rows[0]["Baudrate"].ToString());
+            }
+            else
+            {
+                MessageBox.Show("Không tìm thấy controller!");
+            }
+
+            // Check location *************************************************************************************************************************
             string cmdLocation = $"Select * from tblLocation where PCID = '{PCID}' and IsActive = '1'";
             DataTable dtLocation = StaticPool.mdb.FillData(cmdLocation);
 
@@ -116,6 +141,7 @@ namespace PETROLIMEX.Forms
             }
             StaticPool.NumberLocation = StaticPool.listLocationConfig.Count;
 
+          
         }
 
         private static Camera GetCamera(string cameraID)
@@ -124,7 +150,7 @@ namespace PETROLIMEX.Forms
             DataTable dtCam = StaticPool.mdb.FillData(cmdCam);
 
             Camera camera = new Camera();
-            if (dtCam != null || dtCam.Rows.Count > 0)
+            if (dtCam != null && dtCam.Rows.Count > 0)
             {
                 camera.ID = dtCam.Rows[0]["CameraID"].ToString();
                 camera.Name = dtCam.Rows[0]["CameraName"].ToString();
@@ -171,43 +197,11 @@ namespace PETROLIMEX.Forms
             }
             return "";
         }
-        private void LoadSQL()
-        {
-            try
-            {
-                if (File.Exists(StaticPool.SQLConfigPath))
-                {
-                    SQLConfig[] sqlcon = FileXML.ReadXML<SQLConfig>(StaticPool.SQLConfigPath);
-
-                    if (sqlcon != null && sqlcon.Length > 0)
-                    {
-                        StaticPool.SQLServerName = sqlcon[0].SQLServername;
-                        StaticPool.SQLDatabaseName = sqlcon[0].SQLDatabaseName;
-                        StaticPool.SQLAuthentication = sqlcon[0].SQLAuthMode;
-                        StaticPool.SQLUserName = sqlcon[0].SQLUsername;
-                        StaticPool.SQLPassword = sqlcon[0].SQLPassword;
-
-                        StaticPool.mdb = new Mdb(StaticPool.SQLServerName,
-                                                StaticPool.SQLDatabaseName,
-                                                StaticPool.SQLAuthentication,
-                                                StaticPool.SQLUserName,
-                                                StaticPool.SQLPassword);
-                        LogHelperv2.Logger_SystemInfor($"Load SQL thành công", LogHelperv2.SaveLogFolder);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelperv2.Logger_CONTROLLER_Error($"Exception LoadSQL ex = {ex}", LogHelperv2.SaveLogFolder);
-            }
-
-        }
+       
         private void LoadSystemConfig()
         {
             try
             {
-
-
                 if (File.Exists(StaticPool.SystemConfigPath))
                 {
                     ApplicationConfig[] systemconfig = FileXML.ReadXML<ApplicationConfig>(StaticPool.SystemConfigPath);
@@ -215,6 +209,7 @@ namespace PETROLIMEX.Forms
                     if (systemconfig != null && systemconfig.Length > 0)
                     {
                         StaticPool.applicationConfig = systemconfig[0];
+
                         LogHelperv2.Logger_SystemInfor($"LoadSystemConfig thành công", LogHelperv2.SaveLogFolder);
                     }
                 }

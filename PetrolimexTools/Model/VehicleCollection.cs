@@ -1,8 +1,7 @@
-﻿using PETROLIMEX;
-using PETROLIMEX.Helper;
+﻿using PetrolimexTools.Helper;
 using System.Collections;
 
-namespace iPGSTools.Models
+namespace PetrolimexTools.Model
 {
     public class VehicleCollection : CollectionBase
     {

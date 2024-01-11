@@ -1,9 +1,9 @@
-﻿using PETROLIMEX.Helper;
+﻿using PetrolimexTools.Helper;
 using System.Data;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 
-namespace IPGS.Object.Databases
+namespace PetrolimexTools
 {
     public class Mdb
     {

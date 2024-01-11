@@ -1,12 +1,6 @@
-﻿using IPGS.Object.Databases;
-using PetrolimexConfig.Model;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Text;
+﻿using PetrolimexTools.Model;
 
-namespace PETROLIMEX.Helper
+namespace PetrolimexTools.Helper
 {
     public class FileXML
     {

@@ -49,7 +49,7 @@
             this.panelCameraView.Location = new System.Drawing.Point(1, 19);
             this.panelCameraView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelCameraView.Name = "panelCameraView";
-            this.panelCameraView.Size = new System.Drawing.Size(520, 252);
+            this.panelCameraView.Size = new System.Drawing.Size(434, 299);
             this.panelCameraView.TabIndex = 1;
             // 
             // ucCameraView
@@ -62,7 +62,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ucCameraView";
             this.Padding = new System.Windows.Forms.Padding(1, 4, 1, 1);
-            this.Size = new System.Drawing.Size(522, 272);
+            this.Size = new System.Drawing.Size(436, 319);
             this.ResumeLayout(false);
             this.PerformLayout();
 

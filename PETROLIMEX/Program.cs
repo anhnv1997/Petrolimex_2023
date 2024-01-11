@@ -1,7 +1,7 @@
 ﻿//using iPGS.Tools;
 using PETROLIMEX.Forms;
 using System.Diagnostics;
-using PETROLIMEX.Helper;
+using PetrolimexTools.Helper;
 
 namespace iPGSTools
 {

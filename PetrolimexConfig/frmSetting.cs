@@ -66,6 +66,10 @@ namespace PetrolimexConfig
 
             txbTimeClearList.Text = systemInfo.TimeClearList.ToString();
 
+            txbTimeRepeatRefuel.Text = systemInfo.TimeRepeatRefuel.ToString();
+
+            cbbComparePlate.Text = "So sánh >= 4 kí tự";
+
             await LoadViewConfigSQL();
         }
 
@@ -157,12 +161,6 @@ namespace PetrolimexConfig
 
             ApplicationConfig sys = new ApplicationConfig()
             {
-                //CameraIP = txtCameraIp.Text,
-                //CameraPort = (int)numCameraPort.Value,
-                //CameraUsername = txtCameraUsername.Text,
-                //CameraPassword = txtCameraPassword.Text,
-                //DetectType = cbCameraDetectType.Text,
-
                 ApiPort = (int)numApiPort.Value,
                 LPR_API = txtLprServer.Text,
                 FIS_URL = txtPaymentServer.Text,
@@ -174,6 +172,8 @@ namespace PetrolimexConfig
                 TimeDelayDetect = int.Parse(txbTimeDelayDetect.Text),
 
                 TimeClearList = int.Parse(txbTimeClearList.Text),
+
+                TimeRepeatRefuel = int.Parse(txbTimeRepeatRefuel.Text),
             };
             systemlist.Add(sys);
 

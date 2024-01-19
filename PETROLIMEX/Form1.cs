@@ -19,6 +19,13 @@ using static PetrolimexTools.Model.Vehicle;
 using PetrolimexTools;
 using PetrolimexTools.Model;
 using PETROLIMEX.Models;
+using Newtonsoft.Json;
+using System.Text;
+using System.Security.Cryptography;
+using System.Data;
+using static iPGSTools.Helper.MLS;
+using PETROLIMEX.Databases;
+using System.ComponentModel;
 
 namespace iPGSTools
 {
@@ -42,6 +49,7 @@ namespace iPGSTools
         public static Dictionary<string, ConcurrentQueue<GasModel>> locationQueueDictionary = new Dictionary<string, ConcurrentQueue<GasModel>>();
         public static Dictionary<string, Timer> locationTimerDictionary = new Dictionary<string, Timer>();
 
+        private BindingList<dataAutoPayment> dataList = new BindingList<dataAutoPayment>();
         private bool IsEnableAutoOpenApp = true;
         // **************************** Đây là nhánh Multilane ************************************************
         #region Forms
@@ -113,8 +121,14 @@ namespace iPGSTools
                     LogHelperv2.Logger_SystemInfor($"ConnectCardReader thành công", LogHelperv2.SaveLogFolder);
 
                     controller.onEvent += Controller_onEvent;
+                    controller.ConnectStatusChangeEvent += Controller_ConnectStatusChangeEvent;
                     controller.PollingStart();
                 }
+                else
+                {
+                    SendToEmail.SendEmail(SendToEmail.Em_SendEmail.Warning, "Mất kết nối đầu đọc Petrolimex_30");
+                }
+
                 InitDataGridView();
 
             }
@@ -123,6 +137,22 @@ namespace iPGSTools
                 LogHelperv2.Logger_CONTROLLER_Error($"Exception Form1_Load ex: {ex}", LogHelperv2.SaveLogFolder);
             }
         }
+
+        private void Controller_ConnectStatusChangeEvent(object sender, KztekObject.Objects.ControllerEvent.ConnectStatusCHangeEventArgs e)
+        {
+            if(e.CurrentStatus == true)
+            {
+                LogHelperv2.Logger_CONTROLLER_Infor($"kết nối lại thành công đầu đọc IP: {e.ControllerID}, port: {e.Comport}", LogHelperv2.SaveLogFolder);
+                SendToEmail.SendEmail(SendToEmail.Em_SendEmail.Information, "Có kết nối đầu đọc Petrolimex_30 ");
+            }
+            else
+            {
+                LogHelperv2.Logger_CONTROLLER_Warning($"Mất kết nối đầu đọc IP: {e.ControllerID}, port: {e.Comport}", LogHelperv2.SaveLogFolder);
+                SendToEmail.SendEmail(SendToEmail.Em_SendEmail.Warning, "Mất kết nối đầu đọc Petrolimex_30");
+
+            }
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
@@ -184,7 +214,7 @@ namespace iPGSTools
 
         private void InitDataGridView()
         {
-            dgvAutoPaymentVehicle.RowTemplate.Height = 100;
+            //dgvAutoPaymentVehicle.RowTemplate.Height = 100;
         }
 
         #endregion
@@ -326,8 +356,6 @@ namespace iPGSTools
                     LogHelperv2.Logger_CONTROLLER_Error($" Mã etag = rỗng ", LogHelperv2.SaveLogFolder);
                     return;
                 }
-                //LogHelperv2.Logger_CONTROLLER_Infor($"Nhận thành công sự kiện Etag chưa check trùng: {e.CardNumber}", LogHelperv2.SaveLogFolder);
-
                 // Fix cung
                 //e.CardNumber = "3416214B880E700001941070";   // A Nguyên Fixx
                 //e.CardNumber = "3416214B880E700001941111";  
@@ -396,10 +424,11 @@ namespace iPGSTools
 
         public static object lockObj = new object();
         // SỰ KIỆN AGAS 
-        public static async Task UpdateGasEvent(GasModel gasModel, string locationName)
+        public async Task UpdateGasEvent(GasModel gasModel, string locationName)
         {
             try
             {
+                #region: Mô tả
                 // Ví dụ config
                 /* Vị trí 1 gán camera1 Tiandy và vòi 8,9,10 
                    Vị trí 2 gán camera2 Hanse và vòi 5,6,7
@@ -414,12 +443,14 @@ namespace iPGSTools
                 //                                                                                                    - Recoplate nhận dạng mỹ           
                 //                                                                                                    - Detech nhận dạng kztek
                 // Mỗi vị trí sử dụng 1 luồng - Các sự kiện vòi trong cùng 1 vị trí xử lý tuần tự
+                // Ko tạo CreateOrder ở sự kiện bóp cò -> nhân viên trong 1 lần đổ có thể bóp nhả nhiều lần
+                #endregion
 
                 LogHelperv2.Logger_CONTROLLER_Infor($"=>>>>>>>>>>>> Nhận sự kiện Agas, Sự kiện Agas chờ có số lượng: {0}", LogHelperv2.SaveLogFolder, gasModel);
+
                 string IDAgas = Guid.NewGuid().ToString();      // IDAgas khác AgastransID
 
                 //Take Plate
-
                 modelDetech modelDetech = await RecognPlate(gasModel, locationName);
 
                 // lưu sự kiện Agas vào db
@@ -430,376 +461,253 @@ namespace iPGSTools
                     // Lưu lỗi vào tblLog
                     MyQuery.InsertLog(EmTypeLog.LogError, MLS.Agas.InserttblAgasFail, IDAgas, "");
                 }
-
-                if(gasModel.pumpstatus == (int)EM_PumpStatus.NhacCo)
+                switch (gasModel.pumpstatus)
                 {
-                    // So sanh BS
-                }
-                else
-                {
+                    case (int)EM_PumpStatus.NhacCo:
+                        
+                        LogHelperv2.Logger_CONTROLLER_Infor($"Bắt đầu sự kiện nhấc cò plate = {modelDetech.PlateNumber}", LogHelperv2.SaveLogFolder);
 
-                }
+                        if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                        {
+                            await NhacCoEvent(gasModel, modelDetech, IDAgas, locationName);
+                        }
+                        else
+                        {
+                            LogHelperv2.Logger_CONTROLLER_Infor($"plate = {modelDetech.PlateNumber} ko có trong danh sách - Bắt đầu check query lại etag, time đổ lại = {StaticPool.applicationConfig.TimeRepeatRefuel}", LogHelperv2.SaveLogFolder);
 
-                //Kiểm tra danh sách xe tích hợp thanh toán tự động có xe đang đổ xăng hay không
-                if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
-                {
-                    LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số thành công: {modelDetech.PlateNumber} - Biển số có nằm trong danh sách chờ eTag", LogHelperv2.SaveLogFolder);
+                            string etagQuery = "";
 
-                    // Lấy phương tiện ứng vs BS
-                    Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
-                    // Vehicle.PlateNumber đã gán
-                    vehicle.IDAgas = IDAgas;
-                    vehicle.TimeAgas = DateTime.Now;
-                    vehicle.LocationName = locationName;
-
-                    switch (gasModel.pumpstatus)
-                    {
-                        case (int)EM_PumpStatus.NhacCo:
+                            if (CheckEtagValid(modelDetech, ref etagQuery))
                             {
-                                if (vehicle.pumpid != "")
-                                {
-                                    if (vehicle.pumpid != gasModel.pumpid)
-                                    {
-                                        // Đang có sự kiện bơm cho biển số này ở vòi khác
-                                        // Hiện cảnh báo 
-                                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
-                                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đang có sự kiện bơm cho bs: {modelDetech.PlateNumber} này với vòi bơm pumpID = {vehicle.pumpid} này!!!", LogHelperv2.SaveLogFolder, vehicle);
-                                        return;
-                                    }
-                                    else
-                                    {
-                                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
-                                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đã có sự kiện nhấc cò cho bs: {modelDetech.PlateNumber}!!!", LogHelperv2.SaveLogFolder, vehicle);
-                                        return;
-                                    }
-                                }
-                                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.NhacCo;
-                                vehicle.isNhacCo = true;
-                                vehicle.pumpid = gasModel.pumpid;
-                                vehicle.Price = gasModel.price;
-                                vehicle.Volume = 0;
-                                vehicle.Amount = 0;
-                                vehicle.ImgPathPickup = modelDetech.ImagePath;
+                                Controller_onEvent(null, new MT116EventArgs { CardNumber = etagQuery });
 
-                                // Dữ liệu Order
-                                Order order = InitOrder(gasModel, vehicle);
-                                //GỬI API TẠO ĐƠN HÀNG SANG BEAP -- CREATE ORDER
-                                OrderResponse CreatOrderResponse = await FISHelper.CreateOrder(order);
-
-                                if (CreatOrderResponse != null)
-                                {
-                                    LogHelperv2.Logger_CONTROLLER_Infor($"Tạo thành công đơn hàng CreateOrder etag, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
-
-                                    vehicle.feapresponseid = CreatOrderResponse.feapresponseid;
-                                    vehicle.beaptransid = CreatOrderResponse.beaptransid;
-
-                                    UpdateView(vehicle);
-
-                                    // Lưu vào DB
-                                    if (!MyQuery.InsertCreateOrder(vehicle, gasModel))
-                                    {
-                                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblCreateOrderFail, IDAgas, "");
-                                    }
-                                    if (!MyQuery.CheckProcessError(vehicle.platenumber))
-                                    {
-
-                                    }
-                                    if (!MyQuery.InsertMainEvent(vehicle, gasModel))
-                                    {
-                                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
-                                    }
-                                }
-                                else
-                                {
-                                    // Gửi API TẠO ĐƠN HÀNG thất bại null 
-                                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.APICreateOrderFail, IDAgas, "");
-
-                                    AddDGVEventError("Create Order", MLS.NhacCo.APICreateOrderFail, locationName);
-
-                                    if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.NhacCo.APICreateOrderFail))
-                                    {
-                                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
-                                    }
-                                    return;
-                                }
-                            }
-                            break;
-
-                        case (int)EM_PumpStatus.BopCo:
-
-                            vehicle.VehicleStatus = Vehicle.EmVehicleStatus.DangDoXang;
-                            vehicle.Volume = gasModel.volume;
-                            vehicle.Amount = gasModel.amount;
-                            vehicle.ImgPathPumping = modelDetech.ImagePath;
-
-                            // Kiểm tra đã đúng vòi chưa 
-                            if (vehicle.pumpid == gasModel.pumpid)
-                            {
-                                // Kiểm tra có sự kiện nhấc cò chưa
-                                if (vehicle.isNhacCo)       // Sự kiện hợp lệ 
-                                {
-                                    vehicle.isBopCo = true;
-
-                                    if (!MyQuery.UpdateMainEventPumping(vehicle, gasModel))
-                                    {
-                                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.BopCo.UpdatettblMainEventFail_BopCo, IDAgas, "");
-                                    }
-
-                                    LogHelperv2.Logger_CONTROLLER_Infor($"Đang đổ xăng, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
-
-                                    UpdateView(vehicle);
-                                }
-                                else            // Sự kiện sai quy trình
-                                {
-                                    // Bơm xăng, sai quy trinh
-                                    LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, Chưa có sự kiện nhấc cò", LogHelperv2.SaveLogFolder, vehicle);
-                                    UpdateViewError(vehicle, MLS.BopCo.BomXangSaiQuyTrinh);
-                                    DeleteViewAndListEtag(vehicle);
-                                    AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiQuyTrinh, locationName);
-
-                                    if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiQuyTrinh))
-                                    {
-                                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
-                                    }
-                                }
-                            }
-                            else       // // Sự kiện sai quy trình 2
-                            {
-                                // Nhận sự kiện tại vòi bơm khác nhưng bắt biển số tại vòi khác
-                                LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, sự kiện nhấc cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
-                                UpdateViewError(vehicle, MLS.BopCo.BomXangSaiVoi);
-                                DeleteViewAndListEtag(vehicle);
-                                AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiVoi, locationName);
-
-                                if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiVoi))
-                                {
-                                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
-                                }
-                            }
-
-
-                            break;
-
-                        case (int)EM_PumpStatus.GacCo:
-                            {
-                                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.GacCo;
-                                vehicle.Amount = gasModel.amount;
-                                vehicle.Volume = gasModel.volume;
-                                vehicle.ImgPathPutdown = modelDetech.ImagePath;
-
-                                if (vehicle.pumpid == gasModel.pumpid)
-                                {
-                                    if (vehicle.isNhacCo && vehicle.isBopCo)
-                                    {
-                                        // Sự kiện hợp lệ
-                                        vehicle.isGacCo = true;
-
-                                        // Hiển thị đang thanh toán
-                                        UpdateView(vehicle, EmPaymentStatus.DangThanhToan);
-
-                                        //GỬI API YÊU CẦU THANH TOÁN SANG BEAP -- PAYMENT
-                                        Payment payment = InitPayment(gasModel, vehicle);
-
-                                        var paymentResponse = await FISHelper.Payment(payment);
-
-                                        Task.Run(async () =>
-                                        {
-                                            bool isPayment = false;
-                                            if (paymentResponse == null)
-                                            {
-                                                // API Null
-                                                isPayment = false;
-                                                LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với etag paymentResponse = null, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
-
-                                                UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, "api null");
-                                                DeleteViewAndListEtag(vehicle);
-
-                                                AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail, locationName);
-                                                // Thêm tblLog
-                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.APIPaymentFail, IDAgas, "");
-                                            }
-                                            else
-                                            {
-                                                //APi hợp lệ
-                                                //vehicle.VehicleStatus = !string.IsNullOrEmpty(paymentResponse.beaptransid) ? Vehicle.EmVehicleStatus.GacCo : Vehicle.EmVehicleStatus.HuyGiaoDich;
-                                                //Trả về thanh toán thành công
-                                                if (paymentResponse.paystatus.Contains("SUCC"))
-                                                {
-                                                    isPayment = true;
-
-                                                    LogHelperv2.Logger_CONTROLLER_Infor($"Thanh toán thành công với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
-
-                                                    StaticPool.vehicleWithAutoPayments.Remove(vehicle);
-
-
-                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThanhCong);
-                                                    DeleteViewAndListEtag(vehicle);
-
-                                                    /// GỬI KẾT QUẢ THANH TOÁN THÀNH CÔNG ĐẾN AGAS - API LOG + API TẠO HÓA ĐƠN 
-                                                    await Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse, locationName);
-
-
-                                                }
-                                                else if (paymentResponse.paystatus.Contains("FAIL"))  // Thanh toán thất bại
-                                                {
-                                                    isPayment = false;
-                                                    vehicle.Describtion = "Nhận thanh toán FAIL từ Backend";
-                                                    LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
-
-                                                    // Lấy lý do thất bại
-                                                    string reasonFail = paymentResponse.paystatus.Substring(4);
-
-                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, reasonFail);
-                                                    DeleteViewAndListEtag(vehicle);
-                                                }
-                                                else
-                                                {
-                                                    vehicle.Describtion = "Nhận response ngoại lệ từ Backend";
-                                                    UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, vehicle.Describtion);
-                                                    DeleteViewAndListEtag(vehicle);
-
-                                                    LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán trả về ngoại lệ: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
-                                                }
-                                                // Lưu sự kiện bảng Payment 
-                                                if (!MyQuery.InsertPayment(vehicle, paymentResponse))
-                                                {
-                                                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.InserttblPaymentFail, IDAgas, "");
-                                                }
-                                            }
-                                            // Update bảng sự kiện chính MainEvent
-                                            int statusPayment = isPayment ? (int)EmPaymentStatusSQL.ThanhToanThanhCong : (int)EmPaymentStatusSQL.ThanhToanThatBai;
-                                            if (!MyQuery.UpdateMainEventPayment(vehicle, gasModel, statusPayment, true))
-                                            {
-                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
-
-                                            }
-                                        });
-                                    }
-                                    else
-                                    {
-                                        // Huy Đóng vòi, sai quy trình 
-                                        LogHelperv2.Logger_CONTROLLER_Infor($"Đóng vòi, sai quy trình, Chưa có sự kiện bơm xăng", LogHelperv2.SaveLogFolder, vehicle);
-                                        UpdateViewError(vehicle, MLS.GacCo.GacCoError);
-                                        DeleteViewAndListEtag(vehicle);
-                                        AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.GacCo.GacCoError, locationName);
-
-                                        if (!vehicle.isNhacCo)
-                                        {
-                                            if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.GacCo.GacCoSaiQuyTrinh))
-                                            {
-                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (!MyQuery.UpdateMainEvent_GacCoSaiQuyTrinh(vehicle, gasModel, MLS.GacCo.GacCoSaiQuyTrinh))
-                                            {
-                                                MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    LogHelperv2.Logger_CONTROLLER_Error($"Gác cò sai quy trình, sự kiện gác cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
-                                    if (vehicle.IDMainEvent != "")
-                                    {
-                                        MyQuery.UpdateMainEventSaiVoi(vehicle, gasModel);
-                                    }
-                                }
-                            }
-                            break;
-
-                        case (int)EM_PumpStatus.HuyGiaoDich:
-
-                            if (vehicle.pumpid == gasModel.pumpid)
-                            {
-                                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.HuyGiaoDich;
-                                vehicle.ImgPathCancel = modelDetech.ImagePath;
-                                LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
-                                UpdateView(vehicle, EmPaymentStatus.HuyGiaoDich);
-                                DeleteViewAndListEtag(vehicle);
-                                if (!MyQuery.UpdateMainEventCancel(vehicle, gasModel))
-                                {
-                                    MyQuery.InsertLog(EmTypeLog.LogError, "", IDAgas, "");
-                                }
+                                await NhacCoEvent(gasModel, modelDetech, IDAgas, locationName);
                             }
                             else
                             {
-                                LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch sai quy trình, cùng BS nhưng khác vòi bơm", LogHelperv2.SaveLogFolder, vehicle);
+                                // Xử lý với xe chưa đăng ký
+                                HandleUnregisteredVehicleEvent(gasModel, modelDetech, IDAgas, locationName);
+                                return;
                             }
-                            break;
-
-                        default:
-                            return;
-                    }
-                }
-                // Các trường hợp else
-                // Không đọc được biển số - biển số rỗng
-                // Đọc biển số sai
-                // Đọc đúng BS nhưng ko có trong danh sách chờ
-                else
-                {
-                    // Lưu biển số vào danh sách chưa đăng ký
-                    // Hiện tại chưa có phần hiển thị trạng thái đổ xăng của xe chưa đăng ký
-                    LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số - Không tìm thấy biển số trong danh sách eTag (không dùng eTag hoặc eTag ko đăng ký giao dịch)", LogHelperv2.SaveLogFolder, gasModel);
-                    Vehicle vehicleNotRegisted = new Vehicle();
-
-                    if (!MyQuery.CheckProcessError(modelDetech.PlateNumber))
-                    {
-
-                    }
-
-                    switch (gasModel.pumpstatus)
-                    {
-                        case (int)EM_PumpStatus.NhacCo:
-                            // lưu db trạng thái nhấc cò
-                            if (!MyQuery.InsertMainEventNotRegisted(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
-                            {
-                                //
-                            }
-                            break;
-
-                        case (int)EM_PumpStatus.BopCo:
-                            // Tạm thời không check trạng thái đã nhấc cò chưa với xe chưa đăng ký
-                            if (!MyQuery.UpdateMainEventNotRegisted_BopCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
-                            {
-                                //
-                            }
-
-                            break;
-                        case (int)EM_PumpStatus.GacCo:
-                            if (!MyQuery.UpdateMainEventNotRegisted_GacCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
-                            {
-                                //
-                            }
-                            break;
-
-                        case (int)EM_PumpStatus.HuyGiaoDich:
-                            if (!MyQuery.UpdateMainEventNotRegisted_HuyGiaoDich(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
-                            {
-                                //
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-
-                    // Update view
-                    foreach (DataGridViewRow row in frm.dgvEventError.Rows)
-                    {
-                        string nameEvent = row.Cells["NameEvent"].Value?.ToString();
-                        string locationEr = row.Cells["locationError"].Value?.ToString();
-
-                        if (nameEvent.Contains(modelDetech.PlateNumber) && locationName == locationEr)
-                        {
-                            return;
                         }
-                    }
-                    AddDGVEventError(modelDetech.PlateNumber, MLS.Plate.ComparePlateFail, locationName);
+                        break;
 
+                    case (int)EM_PumpStatus.BopCo:
+
+                        LogHelperv2.Logger_CONTROLLER_Infor($"Bắt đầu sự kiện bóp cò plate = {modelDetech.PlateNumber}", LogHelperv2.SaveLogFolder);
+
+                        if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                        {
+                            BopCoEvent(gasModel, locationName, IDAgas, modelDetech);
+                        }
+                        else
+                        {
+                            LogHelperv2.Logger_CONTROLLER_Infor($"plate = {modelDetech.PlateNumber} ko có trong danh sách - Bắt đầu lấy plate nếu so sánh BS hợp lệ", LogHelperv2.SaveLogFolder);
+
+                            // Tìm Vehicle có chứa pumpID này để lấy lại BS
+                            // Check các trường hợp đúng ID vòi nhưng lấy ra sai BS
+                            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPumpID(gasModel.pumpid);
+                            string plateRef = vehicle.platenumber;
+
+                            // Check nếu chứa BS || so sánh đúng 4 kí tự 
+                            if (MLS.SubCompare(modelDetech.PlateNumber, plateRef, plateRef.Length, 4))
+                            {
+                                LogHelperv2.Logger_CONTROLLER_Infor($"So sánh hợp lệ BS mới = {plateRef}", LogHelperv2.SaveLogFolder);
+
+                                modelDetech.PlateNumber = plateRef;
+
+                                BopCoEvent(gasModel, locationName, IDAgas, modelDetech);
+                            }
+                            else
+                            {
+                                HandleUnregisteredVehicleEvent(gasModel, modelDetech, IDAgas, locationName);
+                            }
+                        }
+                        break;
+                    case (int)EM_PumpStatus.GacCo:
+
+                        LogHelperv2.Logger_CONTROLLER_Infor($"Bắt đầu sự kiện gác cò plate = {modelDetech.PlateNumber}", LogHelperv2.SaveLogFolder);
+
+                        if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                        {
+                            await GacCoEvent(gasModel, locationName, IDAgas, modelDetech);
+                        }
+                        else
+                        {
+                            LogHelperv2.Logger_CONTROLLER_Infor($"plate = {modelDetech.PlateNumber} ko có trong danh sách - Bắt đầu lấy plate nếu so sánh BS hợp lệ", LogHelperv2.SaveLogFolder);
+
+                            // Tìm Vehicle có chứa pumpID này để lấy lại BS
+                            // Check các trường hợp đúng ID vòi nhưng lấy ra sai BS
+                            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPumpID(gasModel.pumpid);
+                            string plateRef = vehicle.platenumber;
+
+                            // Nếu gần đúng gán BS đọc được = BS trong DS
+                            if (MLS.SubCompare(modelDetech.PlateNumber, plateRef, plateRef.Length, 4))
+                            {
+                                LogHelperv2.Logger_CONTROLLER_Infor($"So sánh hợp lệ BS mới = {plateRef}", LogHelperv2.SaveLogFolder);
+
+                                modelDetech.PlateNumber = plateRef;
+
+                                await GacCoEvent(gasModel, locationName, IDAgas, modelDetech);
+                            }
+                            else
+                            {
+                                HandleUnregisteredVehicleEvent(gasModel, modelDetech, IDAgas, locationName);
+                            }
+                        }
+                        break;
+
+                    case (int)EM_PumpStatus.HuyGiaoDich:
+
+                        LogHelperv2.Logger_CONTROLLER_Infor($"Bắt đầu sự kiện hủy giao dịch plate = {modelDetech.PlateNumber}", LogHelperv2.SaveLogFolder);
+
+                        if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                        {
+                            HuyGiaoDichEvent(gasModel, modelDetech, IDAgas, locationName);
+                        }
+                        else
+                        {
+                            LogHelperv2.Logger_CONTROLLER_Infor($"plate = {modelDetech.PlateNumber} ko có trong danh sách - Bắt đầu lấy plate nếu so sánh BS hợp lệ", LogHelperv2.SaveLogFolder);
+
+                            // Check các trường hợp đúng ID vòi nhưng lấy ra sai BS
+                            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPumpID(gasModel.pumpid);
+                            string plateRef = vehicle.platenumber;
+
+                            // Nếu gần đúng gán BS đọc được = BS trong DS
+                            if (MLS.SubCompare(modelDetech.PlateNumber, plateRef, plateRef.Length, 4))
+                            {
+                                LogHelperv2.Logger_CONTROLLER_Infor($"So sánh hợp lệ BS mới = {plateRef}", LogHelperv2.SaveLogFolder);
+
+                                modelDetech.PlateNumber = plateRef;
+
+                                HuyGiaoDichEvent(gasModel, modelDetech, IDAgas, locationName);
+                            }
+                            else
+                            {
+                                HandleUnregisteredVehicleEvent(gasModel, modelDetech, IDAgas, locationName);
+                            }
+                        }
+                        break;
                 }
+
+                #region : code cu
+                ////Kiểm tra danh sách xe tích hợp thanh toán tự động có xe đang đổ xăng hay không
+                //if (StaticPool.vehicleWithAutoPayments.IsContainPlate(modelDetech.PlateNumber))
+                //{
+                //    LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số thành công: {modelDetech.PlateNumber} - Biển số có nằm trong danh sách chờ eTag", LogHelperv2.SaveLogFolder);
+
+                //    // Lấy phương tiện ứng vs BS
+                //    Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+                //    // Vehicle.PlateNumber đã gán
+                //    vehicle.IDAgas = IDAgas;
+                //    vehicle.TimeAgas = DateTime.Now;
+                //    vehicle.LocationName = locationName;
+
+                //    switch (gasModel.pumpstatus)
+                //    {
+                //        case (int)EM_PumpStatus.NhacCo:
+                //            {
+                //                if (vehicle.pumpid != "")
+                //                {
+                //                    if (vehicle.pumpid != gasModel.pumpid)
+                //                    {
+                //                        // Đang có sự kiện bơm cho biển số này ở vòi khác
+                //                        // Hiện cảnh báo 
+                //                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                //                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đang có sự kiện bơm cho bs: {modelDetech.PlateNumber} này với vòi bơm pumpID = {vehicle.pumpid} này!!!", LogHelperv2.SaveLogFolder, vehicle);
+                //                        return;
+                //                    }
+                //                    else
+                //                    {
+                //                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                //                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đã có sự kiện nhấc cò cho bs: {modelDetech.PlateNumber}!!!", LogHelperv2.SaveLogFolder, vehicle);
+                //                        return;
+                //                    }
+                //                }
+                //                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.NhacCo;
+                //                vehicle.isNhacCo = true;
+                //                vehicle.pumpid = gasModel.pumpid;
+                //                vehicle.Price = gasModel.price;
+                //                vehicle.Volume = 0;
+                //                vehicle.Amount = 0;
+                //                vehicle.ImgPathPickup = modelDetech.ImagePath;
+
+                //                // Dữ liệu Order
+                //                Order order = InitOrder(gasModel, vehicle);
+                //                //GỬI API TẠO ĐƠN HÀNG SANG BEAP -- CREATE ORDER
+                //                OrderResponse CreatOrderResponse = await FISHelper.CreateOrder(order);
+
+                //                if (CreatOrderResponse != null)
+                //                {
+                //                    LogHelperv2.Logger_CONTROLLER_Infor($"Tạo thành công đơn hàng CreateOrder etag, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
+
+                //                    vehicle.feapresponseid = CreatOrderResponse.feapresponseid;
+                //                    vehicle.beaptransid = CreatOrderResponse.beaptransid;
+
+                //                    UpdateView(vehicle);
+
+                //                    // Lưu vào DB
+                //                    if (!MyQuery.InsertCreateOrder(vehicle, gasModel))
+                //                    {
+                //                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblCreateOrderFail, IDAgas, "");
+                //                    }
+                //                    if (!MyQuery.CheckProcessError(vehicle.platenumber))
+                //                    {
+
+                //                    }
+                //                    if (!MyQuery.InsertMainEvent(vehicle, gasModel))
+                //                    {
+                //                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                //                    }
+                //                }
+                //                else
+                //                {
+                //                    // Gửi API TẠO ĐƠN HÀNG thất bại null 
+                //                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.APICreateOrderFail, IDAgas, "");
+
+                //                    AddDGVEventError("Create Order", MLS.NhacCo.APICreateOrderFail, locationName);
+
+                //                    if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.NhacCo.APICreateOrderFail))
+                //                    {
+                //                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                //                    }
+                //                    return;
+                //                }
+                //            }
+                //            break;
+
+                //        case (int)EM_PumpStatus.BopCo:
+
+                //            BopCoEvent(gasModel, locationName, IDAgas, modelDetech);
+
+                //            break;
+
+                //        case (int)EM_PumpStatus.GacCo:
+                //            {
+                //                await GacCoEvent(gasModel, locationName, IDAgas, modelDetech);
+                //            }
+                //            break;
+
+                //        case (int)EM_PumpStatus.HuyGiaoDich:
+
+                //            HuyGiaoDichEvent(gasModel, modelDetech, IDAgas, locationName);
+                //            break;
+
+                //        default:
+                //            return;
+                //    }
+                //}
+                //// Các trường hợp else
+                //// Không đọc được biển số - biển số rỗng
+                //// Đọc biển số sai
+                //// Đọc đúng BS nhưng ko có trong danh sách chờ
+                //else
+                //{
+
+
+                //}
                 //Update view
+                #endregion
             }
             catch (Exception ex)
             {
@@ -807,6 +715,326 @@ namespace iPGSTools
             }
         }
 
+        private static void HuyGiaoDichEvent(GasModel gasModel, modelDetech modelDetech, string IDAgas, string locationName)
+        {
+            // Lấy phương tiện ứng vs BS
+            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+            vehicle.IDAgas = IDAgas;
+            vehicle.TimeAgas = DateTime.Now;
+            vehicle.LocationName = locationName;
+
+            if (vehicle.pumpid == gasModel.pumpid)
+            {
+                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.HuyGiaoDich;
+                vehicle.ImgPathCancel = modelDetech.ImagePath;
+                LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+                UpdateView(vehicle, EmPaymentStatus.HuyGiaoDich);
+                DeleteViewAndListEtag(vehicle);
+                if (!MyQuery.UpdateMainEventCancel(vehicle, gasModel))
+                {
+                    MyQuery.InsertLog(EmTypeLog.LogError, "", IDAgas, "");
+
+                }
+            }
+            else
+            {
+                LogHelperv2.Logger_CONTROLLER_Infor($"Hủy giao dịch sai quy trình, cùng BS nhưng khác vòi bơm", LogHelperv2.SaveLogFolder, vehicle);
+            }
+        }
+
+        private static async Task GacCoEvent(GasModel gasModel, string locationName, string IDAgas, modelDetech modelDetech)
+        {
+            // Lấy phương tiện ứng vs BS
+            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+            // Vehicle.PlateNumber đã gán
+            vehicle.IDAgas = IDAgas;
+            vehicle.TimeAgas = DateTime.Now;
+            vehicle.LocationName = locationName;
+
+            vehicle.VehicleStatus = Vehicle.EmVehicleStatus.GacCo;
+            vehicle.Amount = gasModel.amount;
+            vehicle.Volume = gasModel.volume;
+            vehicle.ImgPathPutdown = modelDetech.ImagePath;
+
+            if (vehicle.pumpid == gasModel.pumpid)
+            {
+                if (vehicle.isNhacCo && vehicle.isBopCo)
+                {
+                    // Sự kiện hợp lệ
+                    vehicle.isGacCo = true;
+
+                    // Hiển thị đang thanh toán
+                    UpdateView(vehicle, EmPaymentStatus.DangThanhToan);
+
+                    //GỬI API YÊU CẦU THANH TOÁN SANG BEAP -- PAYMENT
+                    Payment payment = InitPayment(gasModel, vehicle);
+
+                    var paymentResponse = await FISHelper.Payment(payment);
+
+                    bool isPayment = false;
+                    if (paymentResponse == null)
+                    {
+                        // API Null
+                        LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với etag paymentResponse = null, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
+                        isPayment = false;
+                        vehicle.Describtion = "Payment null";
+
+                        UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, vehicle.Describtion);
+
+                        DeleteViewAndListEtag(vehicle);
+
+                        AddDGVEventError("Payment Fail", MLS.GacCo.APIPaymentFail, locationName);
+
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.APIPaymentFail, IDAgas, "");
+
+                        paymentResponse = new PaymentResponse() { paystatus = "FAIL" };
+                        if (!MyQuery.InsertPayment(vehicle, paymentResponse))
+                        {
+                            MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.InserttblPaymentFail, IDAgas, "");
+                        }
+                    }
+                    else
+                    {
+                        //APi hợp lệ
+                        //vehicle.VehicleStatus = !string.IsNullOrEmpty(paymentResponse.beaptransid) ? Vehicle.EmVehicleStatus.GacCo : Vehicle.EmVehicleStatus.HuyGiaoDich;
+                        //Trả về thanh toán thành công
+                        if (paymentResponse.paystatus.Contains("SUCC"))
+                        {
+                            isPayment = true;
+
+                            LogHelperv2.Logger_CONTROLLER_Infor($"Thanh toán thành công với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+
+                            StaticPool.vehicleWithAutoPayments.Remove(vehicle);
+
+                            UpdateView(vehicle, EmPaymentStatus.ThanhToanThanhCong);
+
+                            DeleteViewAndListEtag(vehicle);
+
+                            /// GỬI KẾT QUẢ THANH TOÁN THÀNH CÔNG ĐẾN AGAS - API LOG + API TẠO HÓA ĐƠN 
+                            Task.Run(async () => Send_API_Result_To_Agas(IDAgas, vehicle, payment, paymentResponse, locationName));
+
+                        }
+                        else if (paymentResponse.paystatus.Contains("FAIL"))  // Thanh toán thất bại
+                        {
+                            isPayment = false;
+                            LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán thất bại với biển số: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+
+                            vehicle.Describtion = paymentResponse.payMesage != "" ? paymentResponse.payMesage : "Nhận thanh toán FAIL từ Backend";
+
+                            UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, vehicle.Describtion);
+
+                            DeleteViewAndListEtag(vehicle);
+                        }
+                        else
+                        {
+                            vehicle.Describtion = "Nhận response ngoại lệ từ Backend";
+
+                            UpdateView(vehicle, EmPaymentStatus.ThanhToanThatBai, vehicle.Describtion);
+
+                            DeleteViewAndListEtag(vehicle);
+
+                            LogHelperv2.Logger_CONTROLLER_Error($"Thanh toán trả về ngoại lệ: {vehicle.platenumber}, eTag: {vehicle.etag}", LogHelperv2.SaveLogFolder, vehicle);
+                        }
+                        // Lưu sự kiện bảng Payment 
+                        if (!MyQuery.InsertPayment(vehicle, paymentResponse))
+                        {
+                            MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.InserttblPaymentFail, IDAgas, "");
+                        }
+                    }
+                    // Update bảng sự kiện chính MainEvent
+                    int statusPayment = isPayment ? (int)EmPaymentStatusSQL.ThanhToanThanhCong : (int)EmPaymentStatusSQL.ThanhToanThatBai;
+                    if (!MyQuery.UpdateMainEventPayment(vehicle, gasModel, statusPayment, true))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
+
+                    }
+                }
+                else
+                {
+                    // Huy Đóng vòi, sai quy trình 
+                    LogHelperv2.Logger_CONTROLLER_Infor($"Đóng vòi, sai quy trình, Chưa có sự kiện bơm xăng", LogHelperv2.SaveLogFolder, vehicle);
+                    UpdateViewError(vehicle, MLS.GacCo.GacCoError);
+                    DeleteViewAndListEtag(vehicle);
+                    AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.GacCo.GacCoError, locationName);
+
+                    if (!vehicle.isNhacCo)
+                    {
+                        if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.GacCo.GacCoSaiQuyTrinh))
+                        {
+                            MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                        }
+                    }
+                    else
+                    {
+                        if (!MyQuery.UpdateMainEvent_GacCoSaiQuyTrinh(vehicle, gasModel, MLS.GacCo.GacCoSaiQuyTrinh))
+                        {
+                            MyQuery.InsertLog(EmTypeLog.LogError, MLS.GacCo.UpdatettblMainEventFail_GacCo, IDAgas, "");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                LogHelperv2.Logger_CONTROLLER_Error($"Gác cò sai quy trình, sự kiện gác cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
+                if (vehicle.IDMainEvent != "")
+                {
+                    MyQuery.UpdateMainEventSaiVoi(vehicle, gasModel);
+                }
+            }
+        }
+
+        private static void BopCoEvent(GasModel gasModel, string locationName, string IDAgas, modelDetech modelDetech)
+        {
+            // Lấy phương tiện ứng vs BS
+            Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+            // Vehicle.PlateNumber đã gán
+            vehicle.IDAgas = IDAgas;
+            vehicle.TimeAgas = DateTime.Now;
+            vehicle.LocationName = locationName;
+
+            vehicle.VehicleStatus = Vehicle.EmVehicleStatus.DangDoXang;
+            vehicle.Volume = gasModel.volume;
+            vehicle.Amount = gasModel.amount;
+            vehicle.ImgPathPumping = modelDetech.ImagePath;
+
+            // Kiểm tra đã đúng vòi chưa 
+            if (vehicle.pumpid == gasModel.pumpid)
+            {
+                // Kiểm tra có sự kiện nhấc cò chưa
+                if (vehicle.isNhacCo)       // Sự kiện hợp lệ 
+                {
+                    vehicle.isBopCo = true;
+
+                    if (!MyQuery.UpdateMainEventPumping(vehicle, gasModel))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.BopCo.UpdatettblMainEventFail_BopCo, IDAgas, "");
+                    }
+
+                    LogHelperv2.Logger_CONTROLLER_Infor($"Đang đổ xăng, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
+
+                    UpdateView(vehicle);
+                }
+                else            // Sự kiện sai quy trình
+                {
+                    // Bơm xăng, sai quy trinh
+                    LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, Chưa có sự kiện nhấc cò", LogHelperv2.SaveLogFolder, vehicle);
+                    UpdateViewError(vehicle, MLS.BopCo.BomXangSaiQuyTrinh);
+
+                    // Lấy dữ liệu Vehicle
+
+
+                    DeleteViewAndListEtag(vehicle);
+                    AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiQuyTrinh, locationName);
+
+                    if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiQuyTrinh))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                    }
+                }
+            }
+            else       // // Sự kiện sai quy trình 2
+            {
+                // Nhận sự kiện tại vòi bơm khác nhưng bắt biển số tại vòi khác
+                LogHelperv2.Logger_CONTROLLER_Infor($"Bơm xăng sai quy trình, sự kiện nhấc cò và bóp cò cùng BS nhưng của 2 vòi bơm khác nhau", LogHelperv2.SaveLogFolder, vehicle);
+                UpdateViewError(vehicle, MLS.BopCo.BomXangSaiVoi);
+                DeleteViewAndListEtag(vehicle);
+                AddDGVEventError($"Biển số {vehicle.platenumber}", MLS.BopCo.BomXangSaiVoi, locationName);
+
+                if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.BopCo.BomXangSaiVoi))
+                {
+                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                }
+            }
+        }
+
+        private async Task NhacCoEvent(GasModel gasModel, modelDetech modelDetech, string IDAgas, string locationName)
+        {
+            try
+            {
+                // Lấy phương tiện ứng vs BS
+                Vehicle vehicle = StaticPool.vehicleWithAutoPayments.GetVehicleByPlate(modelDetech.PlateNumber);
+                // Vehicle.PlateNumber đã gán
+                vehicle.IDAgas = IDAgas;
+                vehicle.TimeAgas = DateTime.Now;
+                vehicle.LocationName = locationName;
+
+                if (vehicle.pumpid != "")
+                {
+                    if (vehicle.pumpid != gasModel.pumpid)
+                    {
+                        // Đang có sự kiện bơm cho biển số này ở vòi khác
+                        // Hiện cảnh báo 
+                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đang có sự kiện bơm cho bs: {modelDetech.PlateNumber} này với vòi bơm pumpID = {vehicle.pumpid} này!!!", LogHelperv2.SaveLogFolder, vehicle);
+                        return;
+                    }
+                    else
+                    {
+                        AddDGVEventError(modelDetech.PlateNumber, MLS.NhacCo.WrongPump, locationName);
+                        LogHelperv2.Logger_CONTROLLER_Warning($"Cảnh báo sự kiện nhấc cò: vòi bơm hiện tại: {gasModel.pumpid}. Đã có sự kiện nhấc cò cho bs: {modelDetech.PlateNumber}!!!", LogHelperv2.SaveLogFolder, vehicle);
+
+                        DeleteViewAndListEtag(vehicle);
+
+                        UpdateGasEvent(gasModel, locationName);
+                        return;
+                    }
+                }
+                vehicle.VehicleStatus = Vehicle.EmVehicleStatus.NhacCo;
+                vehicle.isNhacCo = true;
+                vehicle.pumpid = gasModel.pumpid;
+                vehicle.Price = gasModel.price;
+                vehicle.Volume = 0;
+                vehicle.Amount = 0;
+                vehicle.ImgPathPickup = modelDetech.ImagePath;
+
+                // Dữ liệu Order
+                Order order = InitOrder(gasModel, vehicle);
+                //GỬI API TẠO ĐƠN HÀNG SANG BEAP -- CREATE ORDER
+                OrderResponse CreatOrderResponse = await FISHelper.CreateOrder(order);
+
+                if (CreatOrderResponse != null)
+                {
+                    LogHelperv2.Logger_CONTROLLER_Infor($"Tạo thành công đơn hàng CreateOrder etag, cập nhật Vehicle:", LogHelperv2.SaveLogFolder, vehicle);
+
+                    vehicle.feapresponseid = CreatOrderResponse.feapresponseid;
+                    vehicle.beaptransid = CreatOrderResponse.beaptransid;
+
+                    UpdateView(vehicle);
+
+                    // Lưu vào DB
+                    if (!MyQuery.InsertCreateOrder(vehicle, gasModel))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblCreateOrderFail, IDAgas, "");
+                    }
+                    if (!MyQuery.CheckProcessError(vehicle.platenumber))
+                    {
+
+                    }
+                    if (!MyQuery.InsertMainEvent(vehicle, gasModel))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                    }
+                }
+                else
+                {
+                    // Gửi API TẠO ĐƠN HÀNG thất bại null 
+                    MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.APICreateOrderFail, IDAgas, "");
+
+                    AddDGVEventError("Create Order", MLS.NhacCo.APICreateOrderFail, locationName);
+
+                    if (!MyQuery.InsertMainEvent_SaiQuyTrinh(vehicle, gasModel, MLS.NhacCo.APICreateOrderFail))
+                    {
+                        MyQuery.InsertLog(EmTypeLog.LogError, MLS.NhacCo.InserttblMainEventFail, IDAgas, "");
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
         private static async Task Send_API_Result_To_Agas(string IDAgas, Vehicle vehicle, Payment payment, PaymentResponse? paymentResponse, string locationName)
         {
             try
@@ -849,7 +1077,104 @@ namespace iPGSTools
             }
 
         }
+        private void HandleUnregisteredVehicleEvent(GasModel gasModel, modelDetech modelDetech, string IDAgas, string locationName)
+        {
+            try
+            {
+                // Lưu biển số vào danh sách chưa đăng ký
+                // Hiện tại chưa có phần hiển thị trạng thái đổ xăng của xe chưa đăng ký
+                LogHelperv2.Logger_CONTROLLER_Infor($"So sánh biển số - Không tìm thấy biển số trong danh sách eTag (không dùng eTag hoặc eTag ko đăng ký giao dịch)", LogHelperv2.SaveLogFolder, gasModel);
+                Vehicle vehicleNotRegisted = new Vehicle();
 
+                if (!MyQuery.CheckProcessError(modelDetech.PlateNumber))
+                {
+
+                }
+
+                switch (gasModel.pumpstatus)
+                {
+                    case (int)EM_PumpStatus.NhacCo:
+                        // lưu db trạng thái nhấc cò
+                        if (!MyQuery.InsertMainEventNotRegisted(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
+                        {
+                            //
+                        }
+                        break;
+
+                    case (int)EM_PumpStatus.BopCo:
+                        // Tạm thời không check trạng thái đã nhấc cò chưa với xe chưa đăng ký
+                        if (!MyQuery.UpdateMainEventNotRegisted_BopCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
+                        {
+                            //
+                        }
+
+                        break;
+                    case (int)EM_PumpStatus.GacCo:
+                        if (!MyQuery.UpdateMainEventNotRegisted_GacCo(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
+                        {
+                            //
+                        }
+                        break;
+
+                    case (int)EM_PumpStatus.HuyGiaoDich:
+                        if (!MyQuery.UpdateMainEventNotRegisted_HuyGiaoDich(gasModel, modelDetech.PlateNumber, IDAgas, modelDetech.ImagePath))
+                        {
+                            //
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                // Update view
+                foreach (DataGridViewRow row in frm.dgvEventError.Rows)
+                {
+                    string nameEvent = row.Cells["NameEvent"].Value?.ToString();
+                    string locationEr = row.Cells["locationError"].Value?.ToString();
+
+                    if (nameEvent.Contains(modelDetech.PlateNumber) && locationName == locationEr)
+                    {
+                        return;
+                    }
+                }
+                AddDGVEventError(modelDetech.PlateNumber, MLS.Plate.ComparePlateFail, locationName);
+            }
+            catch (Exception ex)
+            {
+                LogHelperv2.Logger_CONTROLLER_Error($"Exception HandleUnregisteredVehicleEvent ex = {ex}", LogHelperv2.SaveLogFolder);
+            }
+        }
+        private bool CheckEtagValid(modelDetech modelDetech, ref string etagQuery)
+        {
+            try
+            {
+                string cmdEtag = $"select  top 1 CreateDate,Etag  from tblEtagEvent where PlateRegisted = '{modelDetech.PlateNumber}' order by CreateDate desc";
+                DataTable dtEtag = StaticPool.mdb.FillData(cmdEtag);
+                if (dtEtag != null && dtEtag.Rows.Count > 0)
+                {
+                    DateTime timeEtag = (DateTime)dtEtag.Rows[0]["CreateDate"];
+                    etagQuery = dtEtag.Rows[0]["Etag"].ToString();
+
+                    if (string.IsNullOrEmpty(etagQuery)) return false;
+
+                    TimeSpan duration = DateTime.Now - timeEtag;
+                    if (Math.Abs(duration.TotalMinutes) <= StaticPool.applicationConfig.TimeRepeatRefuel)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogHelperv2.Logger_CONTROLLER_Error($"Exception CheckEtagValid ex = {ex}", LogHelperv2.SaveLogFolder);
+                return false;
+            }
+        }
         private void AddDGVPayment(Vehicle vehicle)
         {
             try
@@ -860,8 +1185,8 @@ namespace iPGSTools
                     {
                         dgvAutoPaymentVehicle.Rows.RemoveAt(0);
                     }
-                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, "", vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", "", false);
 
+                    int rowIndex = dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, "", vehicle.platenumber, vehicle.GetDisplayStatus(), 0, 0, "", "", false);
                     dgvAutoPaymentVehicle.CurrentCell = dgvAutoPaymentVehicle.Rows[rowIndex].Cells[1];
 
                     for (int i = 0; i < dgvAutoPaymentVehicle.Rows.Count; i++)
@@ -1062,6 +1387,7 @@ namespace iPGSTools
 
         private static Payment InitPayment(GasModel gasModel, Vehicle vehicle)
         {
+
             Payment payment = new Payment();
             payment.agastransid = gasModel.agastransid;
             payment.timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
@@ -1076,6 +1402,19 @@ namespace iPGSTools
             payment.subid = vehicle.subid;
             payment.beaptransid = vehicle.beaptransid;
             payment.feaprequestid = vehicle.feapresponseid;
+
+            //// Các trường tạo HashID
+            string secret_key = "cGx4UGF5bWVudEVuY3J5cHQ6cGx4UGF5bWVudEAxMjM=";
+            var fieldsToHash = $"{payment.pumpid}{payment.stationid}{payment.price}{payment.amount}{payment.etag}{payment.plxid}{payment.subid}{payment.beaptransid}{payment.feaprequestid}{secret_key}";
+            //5818592395019003416214B880E700001941070PLX001151024722024/01/12 16:52:32your_secret_key
+            string hashId;
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(fieldsToHash));
+                hashId = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+            // Thêm hashId vào dữ liệu
+            payment.GetType().GetProperty("hashId")?.SetValue(payment, hashId);
             return payment;
         }
 
@@ -1309,6 +1648,7 @@ namespace iPGSTools
                         row.Cells["dgvAutoPayment_status"].Value = vehicle.GetDisplayStatus();
                         row.Cells["dgvAutoPayment_volume"].Value = vehicle.Volume.ToString();
                         row.Cells["dgvAutoPayment_amount"].Value = vehicle.Amount.ToString("N0");
+                        reasonFail = reasonFail != "" ? " - " + reasonFail : reasonFail;
                         row.Cells["Payment"].Value = vehicle.GetPaymentStatus(paymentStatus) + $"{reasonFail}";
                         row.Cells["Location"].Value = vehicle.LocationName;
 
@@ -1500,21 +1840,11 @@ namespace iPGSTools
         }
 
 
-        private async void timer1_Tick(object sender, EventArgs e)
-        {
-            //timer1.Enabled = false;
-
-            //if (gasModelQueue.TryDequeue(out GasModel gasModel))
-            //{
-            //    await UpdateGasEvent(gasModel);
-            //}
-
-            //timer1.Enabled = true;
-        }
+       
         private void InitializeTimer(string locationName, ConcurrentQueue<GasModel> gasModelQueue)
         {
             Timer timer = new Timer();
-            timer.Interval = 100;
+            timer.Interval = 10;
 
             // Gán sự kiện Tick cho timer
             timer.Tick += (sender, e) => TimerTickHandler(sender, e, locationName, gasModelQueue);
@@ -1533,7 +1863,6 @@ namespace iPGSTools
             if (gasModelQueue.TryDequeue(out GasModel gasModel))
             {
                 await UpdateGasEvent(gasModel, locationName);
-                await Task.Delay(10000);
             }
 
             timer.Enabled = true;
@@ -1559,16 +1888,9 @@ namespace iPGSTools
             }
         }
 
-        //private void button2_Click(object sender, EventArgs e)
-        //{
-        //    Vehicle vehicle = new Vehicle() { VehicleStatus = Vehicle.EmVehicleStatus.ChoVaoViTriDoXang, platenumber = $"{textBox1.Text}", etag = $"{textBox1.Text}" };
-        //    string etag = textBox1.Text;
-        //    AddDGVEtag(etag, vehicle);
+        private void timer1_Tick(object sender, EventArgs e)
+        {
 
-        //    foreach (Vehicle item in StaticPool.vehicleWithAutoPayments)
-        //    {
-        //        dgvAutoPaymentVehicle.Rows.Add(vehicle.IDVehicle, dgvAutoPaymentVehicle.Rows.Count + 1, DateTime.Now, item.platenumber, item.GetDisplayStatus(), 0, 0, "", "", false);
-        //    }
-        //}
+        }
     }
 }

@@ -1,12 +1,14 @@
 ﻿
 //using iPGS.Tools;
 
+using iPGSTools.Helper;
 using iPGSTools.Models;
 using PetrolimexTools;
 using PetrolimexTools.Helper;
 using PetrolimexTools.Model;
 using System.Data;
 using System.Text;
+using static iPGSTools.Helper.MLS;
 using static PetrolimexTools.Model.Vehicle;
 
 namespace iPGSTools.Databases
@@ -92,9 +94,9 @@ namespace iPGSTools.Databases
                 vehicle.TimePayment = DateTime.Now;
 
                 StringBuilder sb = new StringBuilder();
-                sb.Append("insert into tblPayment (IDPayment, CreateDate, Paystatus, FeapresponseID, Partnercode, BeaptransID, Paytype, Bankcode, Payhash, IDAgas, IsDelete) ");
+                sb.Append("insert into tblPayment (IDPayment, CreateDate, Paystatus, FeapresponseID, Partnercode, BeaptransID, Paytype, Bankcode, Payhash, PayMessage, IDAgas, IsDelete) ");
                 sb.Append($"values ('{vehicle.IDPayment}', '{vehicle.TimePayment}',N'{paymentResponse.paystatus}', '{vehicle.feapresponseid}', '{paymentResponse.partnercode}', ");
-                sb.Append($"'{vehicle.beaptransid}', '{paymentResponse.paytype}', '{paymentResponse.bankcode}', '{paymentResponse.payhash}', '{vehicle.IDAgas}', '{false}' )");
+                sb.Append($"'{vehicle.beaptransid}', '{paymentResponse.paytype}', '{paymentResponse.bankcode}', '{paymentResponse.payhash}', '{paymentResponse.payMesage}', '{vehicle.IDAgas}', '{false}' )");
 
                 if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
                 {
@@ -426,23 +428,27 @@ namespace iPGSTools.Databases
         }
         public static bool InsertLog(EmTypeLog emTypeLog, string mess, string idAgas, string Etag)
         {
-            try
+            Task.Run(() =>
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append($"insert into tblLog (LogID, LogDateTime, LogType, Message, Describe, PCName, IDAgas, IDEtag, IsDelete) ");
-                sb.Append($"values ('{Guid.NewGuid().ToString()}','{DateTime.Now}',N'{emTypeLog}',N'{mess}','{""}','{Environment.MachineName}','{idAgas}','{Etag}','{false}')");
-
-                if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
+                try
                 {
-                    return true;
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append($"insert into tblLog (LogID, LogDateTime, LogType, Message, Describe, PCName, IDAgas, IDEtag, IsDelete) ");
+                    sb.Append($"values ('{Guid.NewGuid().ToString()}','{DateTime.Now}',N'{emTypeLog}',N'{mess}','{""}','{Environment.MachineName}','{idAgas}','{Etag}','{false}')");
+
+                    if (StaticPool.mdb.ExecuteCommand(sb.ToString()))
+                    {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                LogHelperv2.Logger_CONTROLLER_Error($"Exception InsertLog + {ex.ToString()}", LogHelperv2.SaveLogFolder);
-                return false;
-            }
+                catch (Exception ex)
+                {
+                    LogHelperv2.Logger_CONTROLLER_Error($"Exception InsertLog + {ex.ToString()}", LogHelperv2.SaveLogFolder);
+                    return false;
+                }
+            });
+            return true;
         }
         public static bool InsertCreateInvoice(Vehicle vehicle)
         {

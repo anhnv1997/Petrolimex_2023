@@ -29,6 +29,8 @@ namespace PetrolimexTools.Model
 
         public int TimeClearList { get; set; } = 0;
 
+        public int TimeRepeatRefuel { get; set; } = 0;
+
         public ApplicationConfig()
         {
 

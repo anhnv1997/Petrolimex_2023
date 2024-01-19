@@ -105,6 +105,20 @@ namespace PetrolimexTools.Model
                 return false;
             }
         }
+        public Vehicle GetVehicleByPumpID(string pumpID)
+        {
+            lock (lockObj)
+            {
+                foreach (Vehicle vehicle in InnerList)
+                {
+                    if (vehicle.pumpid == pumpID)
+                    {
+                        return vehicle;
+                    }
+                }
+                return default;
+            }
+        }
         public bool IsContainPumpID(string pumpID)
         {
             lock (lockObj)

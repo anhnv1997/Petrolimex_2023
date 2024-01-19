@@ -1,4 +1,6 @@
-﻿namespace iPGSTools.Helper
+﻿using PetrolimexTools.Helper;
+
+namespace iPGSTools.Helper
 {
     public static class MLS
     {
@@ -43,6 +45,54 @@
             public static string InserttblPaymentFail = "Thêm dữ liệu vào bảng tblPayment thất bại";
             public static string UpdatettblMainEventFail_GacCo = "Update dữ liệu vào bảng tblEventMain thất bại, Gác cò";
             public static string UpdatettblMainEventFail_LogPayment = "Update dữ liệu vào bảng tblEventMain thất bại, LogPayment";
+        }
+
+        public static bool SubCompare(string plate1, string plate2, int comparelength, int comparethreshold)
+        {
+            try
+            {
+                if(plate1.Length < 4)
+                {
+                    return false;
+                }
+                if (plate1.Length < comparelength && plate2.Length < comparelength)
+                {
+                    return false;
+                }
+                if (plate1.Contains(plate2) || plate2.Contains(plate1))
+                {
+                    return true;
+                }
+                if (comparethreshold > comparelength)
+                {
+                    comparethreshold = comparelength;
+                }
+
+                //plate1 = plate1.Substring(plate1.Length - comparelength, comparelength);
+                //plate2 = plate2.Substring(plate2.Length - comparelength, comparelength);
+                if(plate1.Length < comparelength)
+                {
+                    comparelength = plate1.Length;
+                }
+                int point = 0;
+                for (int i = 0; i < comparelength; i++)
+                {
+                    if (plate1[i] == plate2[i])
+                    {
+                        point++;
+                    }
+                }
+                if (point >= comparethreshold)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogHelperv2.Logger_CONTROLLER_Error($"Exception subcompare '{plate1}' and '{plate2}' exception : {ex}", LogHelperv2.SaveLogFolder);
+                return false;
+            }
         }
     }
 }

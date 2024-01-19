@@ -44,8 +44,6 @@ namespace PetrolimexTools
         public static string pathImage { get; set; } = "";
         //--Data
         public static VehicleCollection vehicleWithAutoPayments = new VehicleCollection();          // Dữ liệu lưu list danh sách chờ đang lưu chung của các luồng (nếu có nhiều BDK cần lưu riêng)
-        public static VehicleCollection vehicleWithNonAutoPayments = new VehicleCollection();       // Dữ liệu lưu list danh sách xóa
-
 
         #region Function
         public static string StandardlizePlateNumber(this string plateNumber)

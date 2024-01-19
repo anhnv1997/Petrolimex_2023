@@ -15,6 +15,8 @@
         public string subid { get; set; } = string.Empty;
         public string beaptransid { get; set; } = string.Empty;
         public string feaprequestid { get; set; } = string.Empty;
+        public string hashId { get; set; } = string.Empty;
+
     }
     public class PaymentResponse
     {
@@ -25,5 +27,6 @@
         public string paytype { get; set; } = string.Empty;
         public string bankcode { get; set; } = string.Empty;
         public string payhash { get; set; } = string.Empty;
+        public string payMesage { get; set; } = string.Empty;
     }
 }

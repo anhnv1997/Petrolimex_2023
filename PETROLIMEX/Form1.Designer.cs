@@ -32,9 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -62,7 +62,7 @@
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.tabEvent = new Siticone.Desktop.UI.WinForms.SiticoneTabControl();
             this.VehiclePayment2 = new System.Windows.Forms.TabPage();
-            this.dgvAutoPaymentVehicle = new System.Windows.Forms.DataGridView();
+            this.dgvAutoPaymentVehicle = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
             this.IDVehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.STTPayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DateTimePayment = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -88,16 +88,25 @@
             this.Plate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EventError = new System.Windows.Forms.TabPage();
             this.dgvEventError = new Siticone.Desktop.UI.WinForms.SiticoneDataGridView();
-            this.splitter1 = new System.Windows.Forms.Splitter();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.timeClearList = new System.Windows.Forms.Timer(this.components);
             this.STTEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TimeEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.locationError = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.NameEvent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EventHD = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.splitter1 = new System.Windows.Forms.Splitter();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timeClearList = new System.Windows.Forms.Timer(this.components);
+            this.qweq = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sdfsf = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1asdad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1as = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1sadf = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.asac = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.gbbg = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.gggg = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Columnaa1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picEnableOpenApp)).BeginInit();
@@ -333,21 +342,21 @@
             // dgvAutoPaymentVehicle
             // 
             this.dgvAutoPaymentVehicle.AllowUserToAddRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.dgvAutoPaymentVehicle.AllowUserToDeleteRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
             this.dgvAutoPaymentVehicle.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.dgvAutoPaymentVehicle.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
-            this.dgvAutoPaymentVehicle.BackgroundColor = System.Drawing.Color.White;
-            this.dgvAutoPaymentVehicle.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
+            this.dgvAutoPaymentVehicle.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
+            this.dgvAutoPaymentVehicle.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Raised;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(3);
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dgvAutoPaymentVehicle.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.dgvAutoPaymentVehicle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvAutoPaymentVehicle.ColumnHeadersHeight = 30;
+            this.dgvAutoPaymentVehicle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.dgvAutoPaymentVehicle.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.IDVehicle,
             this.STTPayment,
@@ -360,42 +369,63 @@
             this.Payment,
             this.CreateInvoice,
             this.isFinishPayment});
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvAutoPaymentVehicle.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvAutoPaymentVehicle.DefaultCellStyle = dataGridViewCellStyle3;
             this.dgvAutoPaymentVehicle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvAutoPaymentVehicle.GridColor = System.Drawing.Color.Black;
             this.dgvAutoPaymentVehicle.Location = new System.Drawing.Point(3, 3);
-            this.dgvAutoPaymentVehicle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dgvAutoPaymentVehicle.Name = "dgvAutoPaymentVehicle";
             this.dgvAutoPaymentVehicle.ReadOnly = true;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.Padding = new System.Windows.Forms.Padding(3);
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvAutoPaymentVehicle.RowHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvAutoPaymentVehicle.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvAutoPaymentVehicle.RowHeadersVisible = false;
-            this.dgvAutoPaymentVehicle.RowHeadersWidth = 50;
-            this.dgvAutoPaymentVehicle.RowTemplate.Height = 10;
-            this.dgvAutoPaymentVehicle.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvAutoPaymentVehicle.RowHeadersWidth = 30;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            this.dgvAutoPaymentVehicle.RowsDefaultCellStyle = dataGridViewCellStyle5;
+            this.dgvAutoPaymentVehicle.RowTemplate.Height = 50;
             this.dgvAutoPaymentVehicle.Size = new System.Drawing.Size(1162, 223);
             this.dgvAutoPaymentVehicle.TabIndex = 0;
+            this.dgvAutoPaymentVehicle.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
+            this.dgvAutoPaymentVehicle.ThemeStyle.AlternatingRowsStyle.Font = null;
+            this.dgvAutoPaymentVehicle.ThemeStyle.AlternatingRowsStyle.ForeColor = System.Drawing.Color.Empty;
+            this.dgvAutoPaymentVehicle.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = System.Drawing.Color.Empty;
+            this.dgvAutoPaymentVehicle.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = System.Drawing.Color.Empty;
+            this.dgvAutoPaymentVehicle.ThemeStyle.BackColor = System.Drawing.Color.White;
+            this.dgvAutoPaymentVehicle.ThemeStyle.GridColor = System.Drawing.Color.Black;
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Raised;
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.HeaightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            this.dgvAutoPaymentVehicle.ThemeStyle.HeaderStyle.Height = 30;
+            this.dgvAutoPaymentVehicle.ThemeStyle.ReadOnly = true;
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.BackColor = System.Drawing.Color.White;
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.BorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.Height = 50;
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
+            this.dgvAutoPaymentVehicle.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             // 
             // IDVehicle
             // 
-            this.IDVehicle.DataPropertyName = "IDVehicle";
             this.IDVehicle.HeaderText = "IDVehicle";
             this.IDVehicle.Name = "IDVehicle";
             this.IDVehicle.ReadOnly = true;
             this.IDVehicle.Visible = false;
+            this.IDVehicle.Width = 97;
             // 
             // STTPayment
             // 
@@ -409,27 +439,28 @@
             this.DateTimePayment.HeaderText = "Giờ Vào";
             this.DateTimePayment.Name = "DateTimePayment";
             this.DateTimePayment.ReadOnly = true;
-            this.DateTimePayment.Width = 150;
+            this.DateTimePayment.Width = 300;
             // 
             // Location
             // 
             this.Location.HeaderText = "Vị trí";
             this.Location.Name = "Location";
             this.Location.ReadOnly = true;
+            this.Location.Width = 200;
             // 
             // dgvAutoPayment_plate
             // 
             this.dgvAutoPayment_plate.HeaderText = "Biển số xe";
             this.dgvAutoPayment_plate.Name = "dgvAutoPayment_plate";
             this.dgvAutoPayment_plate.ReadOnly = true;
-            this.dgvAutoPayment_plate.Width = 150;
+            this.dgvAutoPayment_plate.Width = 200;
             // 
             // dgvAutoPayment_status
             // 
             this.dgvAutoPayment_status.HeaderText = "Trạng Thái";
             this.dgvAutoPayment_status.Name = "dgvAutoPayment_status";
             this.dgvAutoPayment_status.ReadOnly = true;
-            this.dgvAutoPayment_status.Width = 200;
+            this.dgvAutoPayment_status.Width = 300;
             // 
             // dgvAutoPayment_volume
             // 
@@ -440,38 +471,31 @@
             // 
             // dgvAutoPayment_amount
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dgvAutoPayment_amount.DefaultCellStyle = dataGridViewCellStyle3;
             this.dgvAutoPayment_amount.HeaderText = "Thành Tiền";
             this.dgvAutoPayment_amount.Name = "dgvAutoPayment_amount";
             this.dgvAutoPayment_amount.ReadOnly = true;
-            this.dgvAutoPayment_amount.Width = 150;
             // 
             // Payment
             // 
             this.Payment.HeaderText = "Thanh toán";
             this.Payment.Name = "Payment";
             this.Payment.ReadOnly = true;
-            this.Payment.Width = 162;
+            this.Payment.Width = 300;
             // 
             // CreateInvoice
             // 
-            this.CreateInvoice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.CreateInvoice.HeaderText = "Hóa Đơn";
             this.CreateInvoice.Name = "CreateInvoice";
             this.CreateInvoice.ReadOnly = true;
+            this.CreateInvoice.Width = 200;
             // 
             // isFinishPayment
             // 
-            this.isFinishPayment.FalseValue = "";
             this.isFinishPayment.HeaderText = "Hoàn thành";
             this.isFinishPayment.Name = "isFinishPayment";
             this.isFinishPayment.ReadOnly = true;
             this.isFinishPayment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.isFinishPayment.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.isFinishPayment.TrueValue = "";
-            this.isFinishPayment.Visible = false;
-            this.isFinishPayment.Width = 120;
             // 
             // Etag2
             // 
@@ -670,6 +694,7 @@
             dataGridViewCellStyle11.BackColor = System.Drawing.Color.White;
             this.dgvEventError.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle11;
             this.dgvEventError.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
+            this.dgvEventError.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle12.BackColor = System.Drawing.Color.White;
             dataGridViewCellStyle12.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
@@ -695,7 +720,7 @@
             dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvEventError.DefaultCellStyle = dataGridViewCellStyle13;
             this.dgvEventError.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvEventError.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
+            this.dgvEventError.GridColor = System.Drawing.Color.Black;
             this.dgvEventError.Location = new System.Drawing.Point(0, 0);
             this.dgvEventError.Name = "dgvEventError";
             this.dgvEventError.ReadOnly = true;
@@ -709,9 +734,9 @@
             this.dgvEventError.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = System.Drawing.Color.Empty;
             this.dgvEventError.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = System.Drawing.Color.Empty;
             this.dgvEventError.ThemeStyle.BackColor = System.Drawing.Color.White;
-            this.dgvEventError.ThemeStyle.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
+            this.dgvEventError.ThemeStyle.GridColor = System.Drawing.Color.Black;
             this.dgvEventError.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
-            this.dgvEventError.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.dgvEventError.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             this.dgvEventError.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.dgvEventError.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
             this.dgvEventError.ThemeStyle.HeaderStyle.HeaightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
@@ -724,6 +749,39 @@
             this.dgvEventError.ThemeStyle.RowsStyle.Height = 25;
             this.dgvEventError.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.dgvEventError.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            // 
+            // STTEvent
+            // 
+            this.STTEvent.HeaderText = "STT";
+            this.STTEvent.Name = "STTEvent";
+            this.STTEvent.ReadOnly = true;
+            // 
+            // TimeEvent
+            // 
+            this.TimeEvent.HeaderText = "Thời gian";
+            this.TimeEvent.Name = "TimeEvent";
+            this.TimeEvent.ReadOnly = true;
+            this.TimeEvent.Width = 265;
+            // 
+            // locationError
+            // 
+            this.locationError.HeaderText = "Vị trí";
+            this.locationError.Name = "locationError";
+            this.locationError.ReadOnly = true;
+            // 
+            // NameEvent
+            // 
+            this.NameEvent.HeaderText = "Tên sự kiện";
+            this.NameEvent.Name = "NameEvent";
+            this.NameEvent.ReadOnly = true;
+            this.NameEvent.Width = 264;
+            // 
+            // EventHD
+            // 
+            this.EventHD.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.EventHD.HeaderText = "Trạng thái lỗi";
+            this.EventHD.Name = "EventHD";
+            this.EventHD.ReadOnly = true;
             // 
             // splitter1
             // 
@@ -760,38 +818,51 @@
             this.timeClearList.Interval = 60000;
             this.timeClearList.Tick += new System.EventHandler(this.timeClearList_Tick);
             // 
-            // STTEvent
+            // qweq
             // 
-            this.STTEvent.HeaderText = "STT";
-            this.STTEvent.Name = "STTEvent";
-            this.STTEvent.ReadOnly = true;
+            this.qweq.HeaderText = " IDVehicle";
+            this.qweq.Name = "qweq";
+            this.qweq.Width = 240;
             // 
-            // TimeEvent
+            // sdfsf
             // 
-            this.TimeEvent.HeaderText = "Thời gian";
-            this.TimeEvent.Name = "TimeEvent";
-            this.TimeEvent.ReadOnly = true;
-            this.TimeEvent.Width = 265;
+            this.sdfsf.HeaderText = "STT";
+            this.sdfsf.Name = "sdfsf";
             // 
-            // locationError
+            // Column1asdad
             // 
-            this.locationError.HeaderText = "Vị trí";
-            this.locationError.Name = "locationError";
-            this.locationError.ReadOnly = true;
+            this.Column1asdad.HeaderText = "Giờ Vào";
+            this.Column1asdad.Name = "Column1asdad";
             // 
-            // NameEvent
+            // Column1as
             // 
-            this.NameEvent.HeaderText = "Tên sự kiện";
-            this.NameEvent.Name = "NameEvent";
-            this.NameEvent.ReadOnly = true;
-            this.NameEvent.Width = 264;
+            this.Column1as.HeaderText = "Vị trí";
+            this.Column1as.Name = "Column1as";
             // 
-            // EventHD
+            // Column1sadf
             // 
-            this.EventHD.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.EventHD.HeaderText = "Trạng thái lỗi";
-            this.EventHD.Name = "EventHD";
-            this.EventHD.ReadOnly = true;
+            this.Column1sadf.HeaderText = "Biển số xe";
+            this.Column1sadf.Name = "Column1sadf";
+            // 
+            // asac
+            // 
+            this.asac.HeaderText = "Trạng Thái";
+            this.asac.Name = "asac";
+            // 
+            // gbbg
+            // 
+            this.gbbg.HeaderText = "Khối lượng (lít)";
+            this.gbbg.Name = "gbbg";
+            // 
+            // gggg
+            // 
+            this.gggg.HeaderText = "Thành Tiền";
+            this.gggg.Name = "gggg";
+            // 
+            // Columnaa1
+            // 
+            this.Columnaa1.HeaderText = "Thanh toán";
+            this.Columnaa1.Name = "Columnaa1";
             // 
             // Form1
             // 
@@ -847,7 +918,6 @@
         private Panel pnlTop;
         private Siticone.Desktop.UI.WinForms.SiticoneTabControl tabEvent;
         private TabPage VehiclePayment2;
-        private DataGridView dgvAutoPaymentVehicle;
         private TabPage Etag2;
         private Siticone.Desktop.UI.WinForms.SiticoneDataGridView dgvEtag;
         private TabPage VehicleN;
@@ -876,6 +946,23 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Timer timeClearList;
         private Panel panel3;
+        private ComboBox cbbDetechTest;
+        private DataGridViewTextBoxColumn STTEvent;
+        private DataGridViewTextBoxColumn TimeEvent;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn NameEvent;
+        private DataGridViewTextBoxColumn EventHD;
+        private DataGridViewTextBoxColumn locationError;
+        private Siticone.Desktop.UI.WinForms.SiticoneDataGridView dgvAutoPaymentVehicle;
+        private DataGridViewTextBoxColumn qweq;
+        private DataGridViewTextBoxColumn sdfsf;
+        private DataGridViewTextBoxColumn Column1asdad;
+        private DataGridViewTextBoxColumn Column1as;
+        private DataGridViewTextBoxColumn Column1sadf;
+        private DataGridViewTextBoxColumn asac;
+        private DataGridViewTextBoxColumn gbbg;
+        private DataGridViewTextBoxColumn gggg;
+        private DataGridViewTextBoxColumn Columnaa1;
         private DataGridViewTextBoxColumn IDVehicle;
         private DataGridViewTextBoxColumn STTPayment;
         private DataGridViewTextBoxColumn DateTimePayment;
@@ -887,12 +974,5 @@
         private DataGridViewTextBoxColumn Payment;
         private DataGridViewTextBoxColumn CreateInvoice;
         private DataGridViewCheckBoxColumn isFinishPayment;
-        private ComboBox cbbDetechTest;
-        private DataGridViewTextBoxColumn STTEvent;
-        private DataGridViewTextBoxColumn TimeEvent;
-        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private DataGridViewTextBoxColumn NameEvent;
-        private DataGridViewTextBoxColumn EventHD;
-        private DataGridViewTextBoxColumn locationError;
     }
 }

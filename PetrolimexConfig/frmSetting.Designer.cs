@@ -85,6 +85,12 @@ namespace PetrolimexConfig
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.tabSystem = new System.Windows.Forms.TabPage();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.cbbComparePlate = new Siticone.Desktop.UI.WinForms.SiticoneComboBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.txbTimeRepeatRefuel = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.txbCountDetect = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -180,6 +186,7 @@ namespace PetrolimexConfig
             this.pnlBody = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox4.SuspendLayout();
@@ -192,6 +199,8 @@ namespace PetrolimexConfig
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.tabSystem.SuspendLayout();
+            this.groupBox7.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.groupBox9.SuspendLayout();
             this.tabSQL.SuspendLayout();
@@ -631,6 +640,9 @@ namespace PetrolimexConfig
             // 
             // tabSystem
             // 
+            this.tabSystem.Controls.Add(this.groupBox7);
+            this.tabSystem.Controls.Add(this.label9);
+            this.tabSystem.Controls.Add(this.groupBox3);
             this.tabSystem.Controls.Add(this.groupBox8);
             this.tabSystem.Controls.Add(this.groupBox9);
             this.tabSystem.Location = new System.Drawing.Point(184, 4);
@@ -641,13 +653,77 @@ namespace PetrolimexConfig
             this.tabSystem.Text = "Hệ thống";
             this.tabSystem.UseVisualStyleBackColor = true;
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.cbbComparePlate);
+            this.groupBox7.Controls.Add(this.label8);
+            this.groupBox7.Location = new System.Drawing.Point(93, 263);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(544, 72);
+            this.groupBox7.TabIndex = 2;
+            this.groupBox7.TabStop = false;
+            // 
+            // cbbComparePlate
+            // 
+            this.cbbComparePlate.BackColor = System.Drawing.Color.Transparent;
+            this.cbbComparePlate.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cbbComparePlate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbbComparePlate.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.cbbComparePlate.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.cbbComparePlate.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.cbbComparePlate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
+            this.cbbComparePlate.ItemHeight = 30;
+            this.cbbComparePlate.Items.AddRange(new object[] {
+            "So sánh >= 4 kí tự"});
+            this.cbbComparePlate.Location = new System.Drawing.Point(199, 22);
+            this.cbbComparePlate.Name = "cbbComparePlate";
+            this.cbbComparePlate.Size = new System.Drawing.Size(273, 36);
+            this.cbbComparePlate.TabIndex = 2;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(26, 34);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(94, 15);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "Loại so sánh BS :";
+            this.label8.Click += new System.EventHandler(this.label19_Click);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.txbTimeRepeatRefuel);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Location = new System.Drawing.Point(93, 173);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(544, 72);
+            this.groupBox3.TabIndex = 2;
+            this.groupBox3.TabStop = false;
+            // 
+            // txbTimeRepeatRefuel
+            // 
+            this.txbTimeRepeatRefuel.Location = new System.Drawing.Point(273, 22);
+            this.txbTimeRepeatRefuel.Name = "txbTimeRepeatRefuel";
+            this.txbTimeRepeatRefuel.Size = new System.Drawing.Size(100, 23);
+            this.txbTimeRepeatRefuel.TabIndex = 0;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(19, 25);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(248, 15);
+            this.label7.TabIndex = 1;
+            this.label7.Text = "Thời gian cho phép đổ lại (không cần vào lại) ";
+            this.label7.Click += new System.EventHandler(this.label19_Click);
+            // 
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.txbCountDetect);
             this.groupBox8.Controls.Add(this.label20);
             this.groupBox8.Controls.Add(this.label21);
             this.groupBox8.Controls.Add(this.txbTimeDelayDetect);
-            this.groupBox8.Location = new System.Drawing.Point(163, 162);
+            this.groupBox8.Location = new System.Drawing.Point(93, 58);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(237, 100);
             this.groupBox8.TabIndex = 2;
@@ -692,7 +768,7 @@ namespace PetrolimexConfig
             // 
             this.groupBox9.Controls.Add(this.txbTimeClearList);
             this.groupBox9.Controls.Add(this.label24);
-            this.groupBox9.Location = new System.Drawing.Point(525, 162);
+            this.groupBox9.Location = new System.Drawing.Point(354, 58);
             this.groupBox9.Name = "groupBox9";
             this.groupBox9.Size = new System.Drawing.Size(268, 100);
             this.groupBox9.TabIndex = 2;
@@ -1903,6 +1979,16 @@ namespace PetrolimexConfig
             this.btnRefresh.UseVisualStyleBackColor = false;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(472, 198);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(32, 15);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "phút";
+            this.label9.Click += new System.EventHandler(this.label19_Click);
+            // 
             // frmSetting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1934,6 +2020,11 @@ namespace PetrolimexConfig
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.tabSystem.ResumeLayout(false);
+            this.tabSystem.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             this.groupBox9.ResumeLayout(false);
@@ -2102,5 +2193,12 @@ namespace PetrolimexConfig
         private DataGridViewTextBoxColumn StationName;
         private DataGridViewTextBoxColumn PCIDD;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
+        private GroupBox groupBox3;
+        private TextBox txbTimeRepeatRefuel;
+        private Label label7;
+        private GroupBox groupBox7;
+        private Siticone.Desktop.UI.WinForms.SiticoneComboBox cbbComparePlate;
+        private Label label8;
+        private Label label9;
     }
 }

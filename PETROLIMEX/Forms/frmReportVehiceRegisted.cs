@@ -71,7 +71,7 @@ namespace PETROLIMEX.Forms
                 {
                     sb.Append($"and PlateNumber like '%{txbPlate.Text}%' ");
                 }
-                sb.Append($" and TimeAgasPumpPickup != '' and TimePumping != '' and TimeAgasPutdown != '' and PlateNumber != '' ");
+                //sb.Append($" and TimeAgasPumpPickup != '' and TimePumping != '' and TimeAgasPutdown != '' and PlateNumber != '' ");
                 sb.Append($" and CreateDate between '{dtpFrom.Value}' and '{dtpTo.Value}'");
                 sb.Append($" order by CreateDate DESC");
 
